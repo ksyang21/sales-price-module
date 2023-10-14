@@ -65,16 +65,22 @@ defineProps({
             </div>
 
             <div class="flex justify-center items-center mt-16">
-                <div class="rounded-sm border-gray-500 bg-gray-500 p-6 mx-6">
+                <Link
+                    :href="route('admin_dashboard')"
+                    class="rounded-sm border-gray-500 bg-gray-500 p-6 mx-6"
+                >
                     <div class="flex flex-col">
                         <p class="text-2xl">Admin</p>
                     </div>
-                </div>
-                <div class="rounded-sm border-gray-500 bg-gray-500 p-6 mx-6">
+                </Link>
+                <Link
+                    :href="route('frontend_dashboard')"
+                    class="rounded-sm border-gray-500 bg-gray-500 p-6 mx-6"
+                >
                     <div class="flex flex-col">
                         <p class="text-2xl">Frontend</p>
                     </div>
-                </div>
+                </Link>
             </div>
         </div>
     </div>
