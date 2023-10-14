@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('product_id')->references('id')->on('products');
             $table->unsignedBigInteger('customer_id');
             $table->foreign('customer_id')->references('id')->on('customers');
-            $table->float('price');
+            $table->unsignedFloat('price');
             $table->unsignedBigInteger('max_stock')->comment('maximum count for this customer of this price, if exceed limit, then use original price');
             $table->timestamps();
         });
