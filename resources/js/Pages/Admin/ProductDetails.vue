@@ -1,6 +1,7 @@
 <script setup>
-import {Head, Link} from "@inertiajs/vue3";
+import {Head, Link, usePage} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import {computed} from "vue";
 
 const props = defineProps({
     product: {
@@ -10,6 +11,11 @@ const props = defineProps({
         type: Object
     }
 })
+
+const successMessage = computed(() => usePage().props.alert.success)
+if (successMessage.value) {
+    alert(successMessage.value)
+}
 </script>
 
 <template>
@@ -28,7 +34,7 @@ const props = defineProps({
                     </div>
                     <div class="py-3">
                         <div class="mt-3 mb-6">
-                            <Link :href="route('price.create', product.id)"
+                            <Link :href="route('price.product.create', product.id)"
                                   class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Price</Link>
                         </div>
                         <div class="relative overflow-x-auto">
@@ -56,7 +62,8 @@ const props = defineProps({
                                         {{ price.customer.name }}
                                     </th>
                                     <td class="px-6 py-4">
-                                        {{ parseFloat(price.price).toFixed(2) }}
+                                        <span class="text-gray-200" v-if="parseFloat(price.price) === 0.00">FOC</span>
+                                        <span v-else>{{ parseFloat(price.price).toFixed(2) }}</span>
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ price.max_stock }}

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -54,8 +55,10 @@ Route::middleware(['role:admin'])->group(function () {
     Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
     Route::post('/product', [ProductController::class, 'store'])->name('product.store');
     Route::delete('/product/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
-    Route::get('/create-price/product/{id}', [PriceController::class, 'create'])->name('price.create');
+    Route::get('/create-price/product/{product_id}', [PriceController::class, 'create'])->name('price.product.create');
+    Route::get('/create-price/customer/{customer_id}', [PriceController::class, 'create'])->name('price.customer.create');
     Route::post('/price', [PriceController::class, 'store'])->name('price.store');
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
 });
 Route::get('/frontend_dashboard', [DriverController::class, 'index'])->name('frontend_dashboard');
 

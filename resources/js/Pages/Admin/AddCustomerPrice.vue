@@ -5,38 +5,58 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {reactive, ref} from "vue";
 
 const props = defineProps({
-    product: {
+    customer: {
         type: Object,
     },
-    customers: {
+    products: {
         type: Object,
     },
 })
 
 const form = reactive({
-    product: props.product.id,
-    customer: 0,
+    source: 'customer',
+    customer: props.customer.id,
+    product: 0,
     price: 0.00,
     max_stock: 0
 })
 
+let foc = ref(false)
+
 let canSubmit = ref(true)
+
+let currentProduct = {}
+
+function getProduct() {
+    let productID = form.product
+    currentProduct = props.products.find((product) => {
+        return product.id === productID
+    })
+    form.price = currentProduct.price
+}
+
+function resetPrice() {
+    if(foc.value) {
+        form.price = 0.00
+    } else {
+        if(currentProduct) {
+            form.price = currentProduct.price
+        } else {
+            form.price = 0.00
+        }
+    }
+}
+
 
 function validateForm() {
     canSubmit.value = (form.customer > 0 && form.product > 0)
-    console.log(form)
 }
 
 function handleSubmit() {
     validateForm()
     if (canSubmit.value) {
-        console.log(form)
         router.post('/price', form)
     }
-}
-
-function goBack() {
-    window.history.back()
 }
 
 </script>
@@ -51,36 +71,39 @@ function goBack() {
         </template>
         <div class="py-8">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="flex items-center">
-                    <p class="text-3xl">{{ product.name }}</p>
-                    <p class="text-xl ml-auto">Original Price : {{ product.price }}</p>
-                </div>
+                <p class="text-3xl">{{ customer.name }}</p>
                 <form class="w-full" @submit.prevent="handleSubmit">
                     <div class="p-6 lg:p-8 bg-white mt-2">
                         <div class="w-full px-3 mb-3">
                             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                                   for="customer">Customer</label>
+                                   for="products">Products</label>
                             <select
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                v-model="form.customer"
-                                id="customer"
+                                v-model="form.product"
+                                @change="getProduct"
+                                id="products"
                             >
-                                <option v-for="customer in customers" :value="customer.id">{{ customer.name }}
+                                <option v-for="product in products" :value="product.id">{{ product.name }}
                                 </option>
                             </select>
-                            <p class="text-red-600 text-xs italic" v-if="!canSubmit && !form.customer">Please select
-                                customer</p>
+                            <p class="text-red-600 text-xs italic" v-if="!canSubmit && !form.product">Please select
+                                product</p>
                         </div>
                         <div class="w-full px-3 mb-3">
-                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold"
-                                   for="price">Price</label>
-                            <p class="text-gray-300 text-sm mb-2">Leave it 0 if FOC</p>
+                            <div class="flex items-center">
+                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold"
+                                       for="price">Price</label>
+                                <input type="checkbox" id="foc" class="ml-auto" v-model="foc" @change="resetPrice">
+                                <label for="foc" class="ml-2">FOC</label>
+                            </div>
                             <input
-                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 disabled:bg-gray-300"
                                 id="price" type="number" placeholder="Product price"
-                                v-model="form.price" step="0.01">
+                                v-model="form.price" step="0.01"
+                                :disabled="foc"
+                            >
                         </div>
-                        <div class="w-full px-3 mb-3">
+                        <div class="w-full px-3 mb-3" v-if="form.price === 0.00">
                             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold"
                                    for="stock">Max Stock</label>
                             <p class="text-gray-300 text-sm mb-2">Original price will be used after this customer

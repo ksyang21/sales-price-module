@@ -7,6 +7,7 @@ use App\Models\Price;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 class PriceController extends Controller
@@ -24,15 +25,35 @@ class PriceController extends Controller
      */
     public function create(string $id)
     {
-        $product = Product::find($id);
-        $customers_without_prices = Customer::whereDoesntHave('prices', function ($query) use ($product) {
-            $query->where('product_id', $product->id);
-        })->get();
+        $current_route = Route::current()->getName();
+        if($current_route === 'price.product.create') {
+            $product = Product::find($id);
+            $customers_without_prices = Customer::whereDoesntHave('prices', function ($query) use ($product) {
+                $query->where('product_id', $product->id);
+            })->get();
 
-        return Inertia::render('Admin/AddPrice', [
-            'product' => $product,
-            'customers' => $customers_without_prices,
-        ]);
+            return Inertia::render('Admin/AddProductPrice', [
+                'product' => $product,
+                'customers' => $customers_without_prices,
+            ]);
+        } else {
+            $customer = Customer::find($id);
+//            $products_without_prices = Product::select('products.*')
+//                ->leftJoin('prices', function ($join) use ($id) {
+//                    $join->on('products.id', '=', 'prices.product_id')
+//                        ->where('prices.customer_id', $id);
+//                })
+//                ->whereNull('prices.id')
+//                ->get();
+            $products_without_prices = Product::whereDoesntHave('prices', function ($query) use ($id) {
+                $query->where('customer_id', $id);
+            })->get();
+
+            return Inertia::render('Admin/AddCustomerPrice', [
+                'customer' => $customer,
+                'products' => $products_without_prices
+            ]);
+        }
     }
 
     /**
@@ -40,21 +61,25 @@ class PriceController extends Controller
      */
     public function store(Request $request)
     {
-        $validated_date = $request->validate([
+        $validated_data = $request->validate([
             'product' => 'required|numeric|min:0|not_in:0',
             'customer' => 'required|numeric|min:0|not_in:0',
             'price' => 'required|numeric|min:0',
-            'max_stock' => 'required|numeric|min:0',
+            'max_stock' => 'required|numeric|min:0|max:100',
         ]);
 
         $price = Price::create([
-            'product_id' => $validated_date['product'],
-            'customer_id' => $validated_date['customer'],
-            'price' => $validated_date['price'],
-            'max_stock' => $validated_date['max_stock']
+            'product_id' => $validated_data['product'],
+            'customer_id' => $validated_data['customer'],
+            'price' => $validated_data['price'],
+            'max_stock' => $validated_data['max_stock']
         ]);
 
-        return Redirect::route('product.show', $validated_date['product'])->with('success', 'Price added!');
+        if($request->input('source') === 'product') {
+            return Redirect::route('product.show', $validated_data['product'])->with('success', 'Price added!');
+        } else {
+            return Redirect::route('customer.show', $validated_data['customer'])->with('success', 'Price added!');
+        }
     }
 
     /**

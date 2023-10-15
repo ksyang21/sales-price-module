@@ -1,6 +1,7 @@
 <script setup>
-import {Head, Link} from "@inertiajs/vue3";
+import {Head, Link, usePage} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import {computed} from "vue";
 
 const props = defineProps({
     customer: {
@@ -10,6 +11,11 @@ const props = defineProps({
         type: Object
     }
 })
+
+const successMessage = computed(() => usePage().props.alert.success)
+if (successMessage.value) {
+    alert(successMessage.value)
+}
 
 </script>
 
@@ -29,7 +35,7 @@ const props = defineProps({
                     </div>
                     <div class="py-3">
                         <div class="mt-3 mb-6">
-                            <Link :href="route('price.create', 1)"
+                            <Link :href="route('price.customer.create', customer.id)"
                                   class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Price
                             </Link>
                         </div>
