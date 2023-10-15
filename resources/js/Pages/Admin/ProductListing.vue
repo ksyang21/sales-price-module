@@ -51,6 +51,7 @@ const props = defineProps({
                             </td>
                             <td class="px-6 py-4">
                                 <Link
+                                    as="button"
                                     :href="route('product.show', product.id)"
                                     class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500"
                                 >
