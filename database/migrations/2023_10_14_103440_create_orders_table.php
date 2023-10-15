@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('driver_id');
-            $table->foreign('driver_id')->references('id')->on('users');
+            $table->foreign('driver_id')->references('id')->on('users')->cascadeOnDelete();
             $table->unsignedBigInteger('customer_id');
-            $table->foreign('customer_id')->references('id')->on('customers');
+            $table->foreign('customer_id')->references('id')->on('customers')->cascadeOnDelete();
             $table->unsignedFloat('total_prices');
             $table->timestamps();
         });
