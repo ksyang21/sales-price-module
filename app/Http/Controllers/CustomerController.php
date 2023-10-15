@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
 class CustomerController extends Controller
@@ -22,9 +23,9 @@ class CustomerController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): \Inertia\Response
     {
-        //
+        return Inertia::render('Admin/AddCustomer');
     }
 
     /**
@@ -32,7 +33,15 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated_date = $request->validate([
+            'name' => 'required|string|max:255'
+        ]);
+
+        $customer = Customer::create([
+            'name' => $validated_date['name']
+        ]);
+
+        return Redirect::route('customer_management')->with('success', 'Customer added!');
     }
 
     /**
@@ -62,8 +71,14 @@ class CustomerController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Customer $customer)
+    public function destroy(string $id)
     {
-        //
+        $customer = Customer::find($id);
+        if($customer) {
+            $customer->delete();
+            return Redirect::route('customer_management')->with('success', 'Customer removed');
+        } else {
+            return Redirect::route('customer_management')->with('error', 'Invalid customer ID');
+        }
     }
 }

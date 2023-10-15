@@ -1,12 +1,18 @@
 <script setup>
-import {Head} from "@inertiajs/vue3";
+import {Head, Link, usePage} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import {computed} from "vue";
 
 defineProps({
     customers: {
         type: Object,
     },
 });
+
+const successMessage = computed(() => usePage().props.alert.success)
+if(successMessage.value) {
+    alert(successMessage.value)
+}
 </script>
 
 <template>
@@ -20,7 +26,7 @@ defineProps({
         <div class="py-8">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="mb-6">
-                    <button class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Customer</button>
+                    <Link :href="route('customer.create')" class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Customer</Link>
                 </div>
                 <div class="relative overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -43,8 +49,14 @@ defineProps({
                             <td class="px-6 py-4">
                                 <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500">Edit
                                 </button>
-                                <button class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3">Delete
-                                </button>
+                                <Link
+                                    as="button"
+                                    method="delete"
+                                    :href="route('customer.destroy', customer.id)"
+                                    class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3"
+                                >
+                                    Remove
+                                </Link>
                             </td>
                         </tr>
                         </tbody>

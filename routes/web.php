@@ -37,13 +37,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['role:admin'])->group(function() {
+Route::middleware(['role:admin'])->group(function () {
     Route::get('/driver_management', [DriverController::class, 'index'])->name('driver_management');
     Route::get('/driver/create', [DriverController::class, 'create'])->name('driver.create');
     Route::post('/driver', [DriverController::class, 'store'])->name('driver.store');
     Route::delete('/driver/{id}', [DriverController::class, 'destroy'])->name('driver.destroy');
     Route::get('/customer_management', [CustomerController::class, 'index'])->name('customer_management');
+    Route::get('/customer/create', [CustomerController::class, 'create'])->name('customer.create');
+    Route::post('/customer', [CustomerController::class, 'store'])->name('customer.store');
+    Route::delete('/customer/{id}', [CustomerController::class, 'destroy'])->name('customer.destroy');
 });
 Route::get('/frontend_dashboard', [DriverController::class, 'index'])->name('frontend_dashboard');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
