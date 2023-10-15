@@ -32,6 +32,9 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('driver_management')" :active="route().current('driver_management')">
                                     Driver Management
                                 </NavLink>
+                                <NavLink :href="route('customer_management')" :active="route().current('customer_management')">
+                                    Customer Management
+                                </NavLink>
                             </div>
                         </div>
 

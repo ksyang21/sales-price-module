@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DriverController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +37,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/admin_dashboard', []);
+Route::middleware(['role:admin'])->group(function() {
+    Route::get('/driver_management', [DriverController::class, 'index'])->name('driver_management');
+    Route::get('/customer_management', [CustomerController::class, 'index'])->name('customer_management');
+});
+Route::get('/frontend_dashboard', [DriverController::class, 'index'])->name('frontend_dashboard');
 
 require __DIR__.'/auth.php';
