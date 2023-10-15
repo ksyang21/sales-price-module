@@ -9,6 +9,13 @@ class Price extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'product_id',
+        'customer_id',
+        'price',
+        'max_stock',
+    ];
+
     public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Product::class);

@@ -28,7 +28,7 @@ const props = defineProps({
                     </div>
                     <div class="py-3">
                         <div class="mt-3 mb-6">
-                            <Link :href="route('price.create')"
+                            <Link :href="route('price.create', product.id)"
                                   class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Price</Link>
                         </div>
                         <div class="relative overflow-x-auto">
