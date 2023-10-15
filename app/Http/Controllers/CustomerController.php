@@ -62,9 +62,18 @@ class CustomerController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Customer $customer)
+    public function show(string $id)
     {
-        //
+        $customer = Customer::find($id);
+        $prices = $customer->prices;
+        foreach($prices as &$price) {
+            $price['product'] = $price->product;
+        }
+
+        return Inertia::render('Admin/CustomerDetails', [
+           'customer' => $customer,
+           'prices' => $prices
+        ]);
     }
 
     /**
