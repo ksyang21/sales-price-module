@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\PriceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -40,17 +41,19 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['role:admin'])->group(function () {
     Route::get('/driver_management', [DriverController::class, 'index'])->name('driver_management');
-    Route::get('/driver/create', [DriverController::class, 'create'])->name('driver.create');
+    Route::get('/create-driver', [DriverController::class, 'create'])->name('driver.create');
     Route::post('/driver', [DriverController::class, 'store'])->name('driver.store');
     Route::delete('/driver/{id}', [DriverController::class, 'destroy'])->name('driver.destroy');
     Route::get('/customer_management', [CustomerController::class, 'index'])->name('customer_management');
-    Route::get('/customer/create', [CustomerController::class, 'create'])->name('customer.create');
+    Route::get('/create-customer', [CustomerController::class, 'create'])->name('customer.create');
     Route::post('/customer', [CustomerController::class, 'store'])->name('customer.store');
     Route::delete('/customer/{id}', [CustomerController::class, 'destroy'])->name('customer.destroy');
     Route::get('/products', [ProductController::class, 'index'])->name('products');
-    Route::get('/product/create', [ProductController::class, 'create'])->name('product.create');
+    Route::get('/create-product', [ProductController::class, 'create'])->name('product.create');
+    Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
     Route::post('/product', [ProductController::class, 'store'])->name('product.store');
     Route::delete('/product/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
+    Route::get('/price/create', [PriceController::class, 'create'])->name('price.create');
 });
 Route::get('/frontend_dashboard', [DriverController::class, 'index'])->name('frontend_dashboard');
 

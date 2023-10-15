@@ -49,9 +49,17 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show(string $id)
     {
-        //
+        $product = Product::find($id);
+        $prices = $product->prices;
+        foreach($prices as &$price) {
+            $price['customer'] = $price->customer;
+        }
+        return Inertia::render('Admin/ProductDetails', [
+            'product' => $product,
+            'prices' => $prices
+        ]);
     }
 
     /**

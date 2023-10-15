@@ -12,4 +12,9 @@ class Customer extends Model
     protected $fillable = [
         'name'
     ];
+
+    public function prices(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Price::class);
+    }
 }

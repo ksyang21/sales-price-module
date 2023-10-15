@@ -21,7 +21,9 @@ const props = defineProps({
         <div class="py-8">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="mb-6">
-                    <Link :href="route('product.create')" class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Product</Link>
+                    <Link :href="route('product.create')"
+                          class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Product
+                    </Link>
                 </div>
                 <div class="relative overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -48,7 +50,14 @@ const props = defineProps({
                                 {{ parseFloat(product.price).toFixed(2) }}
                             </td>
                             <td class="px-6 py-4">
-                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500">Edit
+                                <Link
+                                    :href="route('product.show', product.id)"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500"
+                                >
+                                    View
+                                </Link>
+                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ml-3">
+                                    Edit
                                 </button>
                                 <Link
                                     as="button"
