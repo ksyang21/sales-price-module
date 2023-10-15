@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -46,6 +47,10 @@ Route::middleware(['role:admin'])->group(function () {
     Route::get('/customer/create', [CustomerController::class, 'create'])->name('customer.create');
     Route::post('/customer', [CustomerController::class, 'store'])->name('customer.store');
     Route::delete('/customer/{id}', [CustomerController::class, 'destroy'])->name('customer.destroy');
+    Route::get('/products', [ProductController::class, 'index'])->name('products');
+    Route::get('/product/create', [ProductController::class, 'create'])->name('product.create');
+    Route::post('/product', [ProductController::class, 'store'])->name('product.store');
+    Route::delete('/product/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
 });
 Route::get('/frontend_dashboard', [DriverController::class, 'index'])->name('frontend_dashboard');
 
