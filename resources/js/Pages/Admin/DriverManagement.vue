@@ -1,5 +1,5 @@
 <script setup>
-import {Head, Link} from "@inertiajs/vue3";
+import {Head, Link, router} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
 defineProps({
@@ -19,7 +19,9 @@ defineProps({
         <div class="py-8">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="mb-6">
-                    <Link :href="route('driver.create')" class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Driver</Link>
+                    <Link :href="route('driver.create')"
+                          class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Driver
+                    </Link>
                 </div>
                 <div class="relative overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -45,11 +47,17 @@ defineProps({
                             <td class="px-6 py-4">
                                 {{ driver.email }}
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 flex">
                                 <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500">Edit
                                 </button>
-                                <button class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3">Delete
-                                </button>
+                                <Link
+                                    as="button"
+                                    method="delete"
+                                    :href="route('driver.destroy', driver.id)"
+                                    class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3"
+                                >
+                                    Remove
+                                </Link>
                             </td>
                         </tr>
                         </tbody>

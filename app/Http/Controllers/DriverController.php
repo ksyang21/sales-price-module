@@ -83,8 +83,11 @@ class DriverController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): \Illuminate\Http\RedirectResponse
     {
-        //
+        $driver = User::find($id);
+        $driver->delete();
+
+        return Redirect::route('driver_management');
     }
 }
