@@ -1,5 +1,5 @@
 <script setup>
-import {Head} from "@inertiajs/vue3";
+import {Head, Link} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
 defineProps({
@@ -19,7 +19,7 @@ defineProps({
         <div class="py-8">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="mb-6">
-                    <button class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Driver</button>
+                    <Link :href="route('driver.create')" class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Driver</Link>
                 </div>
                 <div class="relative overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
