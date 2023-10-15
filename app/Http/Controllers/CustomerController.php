@@ -41,7 +41,8 @@ class CustomerController extends Controller
                 'string',
                 'max:255',
                 Rule::unique('customers', 'name')
-            ]
+            ],
+            'address' => 'required|string',
         ]);
 
         if($validator->fails()) {
@@ -53,7 +54,8 @@ class CustomerController extends Controller
         $data = $validator->getData();
 
         $customer = Customer::create([
-            'name' => $data['name']
+            'name' => $data['name'],
+            'address' => $data['address']
         ]);
 
         return Redirect::route('customer_management')->with('success', 'Customer added!');

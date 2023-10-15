@@ -11,13 +11,14 @@ const props = defineProps({
 });
 
 const form = reactive({
-    name: ''
+    name: '',
+    address: '',
 });
 
 let canSubmit = ref(true)
 
 function validateForm() {
-    canSubmit.value = form.name !== ''
+    canSubmit.value = (form.name !== '' && form.address !== '')
 }
 
 function handleSubmit() {
@@ -51,6 +52,16 @@ function handleSubmit() {
                                 id="customerName" type="text" placeholder="Customer Name" v-model="form.name">
                             <p class="text-red-600 text-xs italic" v-if="!canSubmit && !form.name">Please enter customer
                                 name</p>
+                        </div>
+                        <div class="w-full px-3 mb-3">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                                   for="customerAddress">Address</label>
+                            <textarea
+                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                id="customerAddress" placeholder="Customer Address" v-model="form.address">
+                            </textarea>
+                            <p class="text-red-600 text-xs italic" v-if="!canSubmit && !form.address">Please enter customer
+                                address</p>
                         </div>
                         <div class="flex items-center mt-10">
                             <Link

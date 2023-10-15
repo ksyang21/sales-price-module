@@ -10,7 +10,7 @@ defineProps({
 });
 
 const successMessage = computed(() => usePage().props.alert.success)
-if(successMessage.value) {
+if (successMessage.value) {
     alert(successMessage.value)
 }
 </script>
@@ -26,7 +26,9 @@ if(successMessage.value) {
         <div class="py-8">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="mb-6">
-                    <Link :href="route('customer.create')" class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Customer</Link>
+                    <Link :href="route('customer.create')"
+                          class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Customer
+                    </Link>
                 </div>
                 <div class="relative overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -36,16 +38,23 @@ if(successMessage.value) {
                                 Customer
                             </th>
                             <th scope="col" class="px-6 py-3">
+                                Address
+                            </th>
+                            <th scope="col" class="px-6 py-3">
                                 Action
                             </th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="customer in customers" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                        <tr v-for="customer in customers"
+                            class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                             <th scope="row"
                                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 {{ customer.name }}
                             </th>
+                            <td class="px-6 py-4">
+                                {{ customer.address }}
+                            </td>
                             <td class="px-6 py-4">
                                 <Link
                                     as="button"

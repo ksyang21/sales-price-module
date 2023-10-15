@@ -10,7 +10,8 @@ class Customer extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'name',
+        'address',
     ];
 
     public function products(): \Illuminate\Database\Eloquent\Relations\HasMany
