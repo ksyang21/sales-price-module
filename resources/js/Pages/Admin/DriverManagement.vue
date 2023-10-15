@@ -1,12 +1,23 @@
 <script setup>
-import {Head, Link, router} from "@inertiajs/vue3";
+import {Head, Link, router, usePage} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import {computed, inject} from "vue";
 
-defineProps({
+const props = defineProps({
     drivers: {
         type: Object,
     },
 });
+
+// Notification messages
+const successMessage = computed(() => usePage().props.alert.success)
+if(successMessage.value) {
+    alert(successMessage.value)
+}
+const errorMessage = computed(() => usePage().props.alert.error)
+if(errorMessage.value) {
+    alert(errorMessage.value)
+}
 </script>
 
 <template>

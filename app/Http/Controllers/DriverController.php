@@ -16,7 +16,7 @@ class DriverController extends Controller
      */
     public function index(): \Inertia\Response
     {
-        $drivers = User::whereHas('roles', function($query) {
+        $drivers = User::whereHas('roles', function ($query) {
             $query->where('name', 'driver');
         })->get();
 
@@ -53,7 +53,7 @@ class DriverController extends Controller
         $driver_role = Role::where('name', 'driver')->first();
         $user->assignRole($driver_role);
 
-        return Redirect::route('driver_management');
+        return Redirect::route('driver_management')->with('success', 'Driver added!');
     }
 
     /**
@@ -87,7 +87,6 @@ class DriverController extends Controller
     {
         $driver = User::find($id);
         $driver->delete();
-
-        return Redirect::route('driver_management');
+        return Redirect::route('driver_management')->with('success', 'Driver removed!');
     }
 }
