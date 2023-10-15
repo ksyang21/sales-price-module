@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class CustomerController extends Controller
@@ -31,14 +33,27 @@ class CustomerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
-        $validated_date = $request->validate([
-            'name' => 'required|string|max:255'
+        $validator = Validator::make($request->all(), [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('customers', 'name')
+            ]
         ]);
 
+        if($validator->fails()) {
+            return Inertia::render('Admin/AddCustomer', [
+                'errors' => $validator->errors()->all()
+            ]);
+        }
+
+        $data = $validator->getData();
+
         $customer = Customer::create([
-            'name' => $validated_date['name']
+            'name' => $data['name']
         ]);
 
         return Redirect::route('customer_management')->with('success', 'Customer added!');

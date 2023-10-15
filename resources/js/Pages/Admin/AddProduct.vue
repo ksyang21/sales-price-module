@@ -1,8 +1,14 @@
 <script setup>
 
-import {Head, router} from "@inertiajs/vue3";
+import {Head, Link, router} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {reactive, ref} from "vue";
+
+const props = defineProps({
+    errors: {
+        type: Object,
+    },
+})
 
 const form = reactive({
     name: '',
@@ -22,10 +28,6 @@ function handleSubmit() {
     }
 }
 
-function goBack() {
-    window.history.back()
-}
-
 </script>
 
 <template>
@@ -38,6 +40,9 @@ function goBack() {
         </template>
         <div class="py-8">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div v-if="errors.length" class="text-red-600">
+                    <p class="text-xl" v-for="error in errors">{{ error }}</p>
+                </div>
                 <form class="w-full" @submit.prevent="handleSubmit">
                     <div class="p-6 lg:p-8 bg-white">
                         <div class="w-full px-3 mb-3">
@@ -58,12 +63,13 @@ function goBack() {
                             <p class="text-red-600 text-xs italic" v-if="!canSubmit && !form.price">Please enter price</p>
                         </div>
                         <div class="flex items-center mt-10">
-                            <button
-                                class="rounded-md bg-blue-700 py-2 px-4 hover:bg-blue-600 text-white" type="button"
-                                @click="goBack"
+                            <Link
+                                as="button"
+                                :href="route('products')"
+                                class="rounded-md bg-blue-700 py-2 px-4 hover:bg-blue-600 text-white"
                             >
-                                Back
-                            </button>
+                                Back to Product Listing
+                            </Link>
                             <button
                                 class="ml-auto px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600"
                                 type="submit"

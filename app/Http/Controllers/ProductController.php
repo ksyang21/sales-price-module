@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -31,16 +33,24 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Request $request): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
-        $validated_data = $request->validate([
-            'name' => 'required|string|max:255',
+        $validator = Validator::make($request->all(), [
+            'name' => ['required','string','max:255', Rule::unique('products', 'name')],
             'price' => 'required|numeric'
         ]);
 
+        if($validator->fails()) {
+            return Inertia::render('Admin/AddProduct', [
+                'errors' => $validator->errors()->all()
+            ]);
+        }
+
+        $data = $validator->getData();
+
         $product = Product::create([
-            'name' => $validated_data['name'],
-            'price' => $validated_data['price'],
+            'name' => $data['name'],
+            'price' => $data['price'],
         ]);
 
         return Redirect::route('products')->with('success', 'New Product added!');

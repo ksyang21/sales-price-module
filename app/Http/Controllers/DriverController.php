@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -36,18 +37,25 @@ class DriverController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Request $request): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
-        $validated_data = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users',
             'password' => 'required|string|min:8',
         ]);
 
+        if($validator->fails()) {
+            return Inertia::render('Admin/AddDriver', [
+                'errors' => $validator->errors()->all()
+            ]);
+        }
+
+        $data = $validator->getData();
         $user = User::create([
-            'name' => $validated_data['name'],
-            'email' => $validated_data['email'],
-            'password' => Hash::make($validated_data['password'])
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password'])
         ]);
 
         $driver_role = Role::where('name', 'driver')->first();
