@@ -59,6 +59,7 @@ Route::middleware(['role:admin'])->group(function () {
     Route::get('/create-price/customer/{customer_id}', [PriceController::class, 'create'])->name('price.customer.create');
     Route::post('/price', [PriceController::class, 'store'])->name('price.store');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+    Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
 });
 Route::get('/frontend_dashboard', [DriverController::class, 'index'])->name('frontend_dashboard');
 

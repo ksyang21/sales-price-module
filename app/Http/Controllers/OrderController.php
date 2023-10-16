@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderDetails;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class OrderController extends Controller
 {
@@ -12,7 +14,20 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        $orders = Order::all();
+        foreach($orders as &$order) {
+            $order['total_prices'] = 0;
+            $order['driver'] = $order->driver;
+            $order['customer'] = $order->customer;
+            $order['details'] = $order->details;
+            foreach($order['details'] as &$detail) {
+                $detail['product'] = $detail->product;
+                $order['total_prices'] += $detail->price * $detail->quantity;
+            }
+        }
+        return Inertia::render('Admin/OrdersListing', [
+            'orders' => $orders
+        ]);
     }
 
     /**
@@ -34,9 +49,17 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Order $order)
+    public function show(string $id)
     {
-        //
+        $order = Order::find($id);
+        $order_details = OrderDetails::where('order_id', $id)->get();
+        foreach($order_details as &$detail) {
+            $detail['product'] = $detail->product;
+        }
+        return Inertia::render('Admin/OrderDetails', [
+            'order' => $order,
+            'details' => $order_details
+        ]);
     }
 
     /**
