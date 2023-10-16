@@ -75,7 +75,7 @@ if (successMessage.value) {
                                         <Link
                                             as="button"
                                             method="delete"
-                                            :href="route('product.destroy', price.id)"
+                                            :href="route('price.destroy', price.id)"
                                             class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3"
                                         >
                                             Remove

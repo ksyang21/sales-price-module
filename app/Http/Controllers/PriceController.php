@@ -109,8 +109,14 @@ class PriceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Price $price)
+    public function destroy(string $id)
     {
-        //
+        $price = Price::find($id);
+        if($price) {
+            $price->delete();
+            return Redirect::route('product.show', $id)->with('success', 'Price removed!');
+        } else {
+            return Redirect::route('product.show', $id)->with('error', 'Invalid product ID');
+        }
     }
 }
