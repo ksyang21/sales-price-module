@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('driver_id')->references('id')->on('users')->cascadeOnDelete();
             $table->unsignedBigInteger('customer_id');
             $table->foreign('customer_id')->references('id')->on('customers')->cascadeOnDelete();
-            $table->enum('status', ['pending', 'delivering', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
             $table->softDeletes();
             $table->timestamps();
         });
