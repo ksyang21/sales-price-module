@@ -9,6 +9,13 @@ class Order extends Model
 {
     use HasFactory;
 
+    public $timestamps = true;
+
+    protected $fillable = [
+        'driver_id',
+        'customer_id',
+        'status'
+    ];
     public function customer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Customer::class, 'customer_id', 'id');

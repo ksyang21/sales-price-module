@@ -9,6 +9,7 @@ class Price extends Model
 {
     use HasFactory;
 
+    public $timestamps = true;
     protected $fillable = [
         'product_id',
         'customer_id',
