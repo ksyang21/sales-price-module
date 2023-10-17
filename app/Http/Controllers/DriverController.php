@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DriverCustomer;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -20,6 +22,11 @@ class DriverController extends Controller
         $drivers = User::whereHas('roles', function ($query) {
             $query->where('name', 'driver');
         })->get();
+
+        foreach($drivers as &$driver) {
+            $driver_customers = DriverCustomer::where('driver_id', $driver->id)->get();
+            $driver['customers'] = $driver_customers;
+        }
 
         return Inertia::render('Admin/DriverManagement', [
             'drivers' => $drivers
@@ -69,7 +76,20 @@ class DriverController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $driver = User::find($id);
+        $orders = Order::where('driver_id', $id)->get();
+        foreach($orders as &$order) {
+            $order['total_price'] = 0;
+            $order['details'] = $order->details;
+            $order['customer'] = $order->customer;
+            foreach($order['details'] as $detail) {
+                $order['total_price'] += $detail['price'];
+            }
+        }
+        return Inertia::render('Frontend/Dashboard', [
+            'orders' => $orders,
+            'driver' => $driver,
+        ]);
     }
 
     /**
