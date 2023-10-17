@@ -1,7 +1,7 @@
 <script setup>
-import {Head, Link, router, usePage} from "@inertiajs/vue3";
+import {Head, Link, usePage} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {computed, inject} from "vue";
+import {computed} from "vue";
 
 const props = defineProps({
     drivers: {
@@ -45,6 +45,9 @@ if(errorMessage.value) {
                                 Email
                             </th>
                             <th scope="col" class="px-6 py-3">
+                                Customers
+                            </th>
+                            <th scope="col" class="px-6 py-3">
                                 Action
                             </th>
                         </tr>
@@ -57,6 +60,9 @@ if(errorMessage.value) {
                             </th>
                             <td class="px-6 py-4">
                                 {{ driver.email }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ driver.customers.length }}
                             </td>
                             <td class="px-6 py-4 flex">
                                 <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500">Edit
