@@ -19,12 +19,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         Customer::factory(10)->create();
-        $products = [
-            'Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5',
-            'Item 6', 'Item 7', 'Item 8', 'Item 9', 'Item 10',
-            'Item 11', 'Item 12', 'Item 13', 'Item 14', 'Item 15',
-        ];
-        foreach($products as $product) {
+        for($i = 1; $i <31; $i++) {
+            $product = sprintf('Item %d', $i);
             $product_data = [
                 'name' => $product,
                 'price' => fake()->randomFloat(2, 0, 3000),
