@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\DriverCustomer;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -123,9 +125,16 @@ class CustomerController extends Controller
     }
 
     public function getCustomerDetails(string $id) {
+        $pending_orders = [];
         $customer = Customer::find($id);
+        $driver = Auth::user();
+        $driver_customer = DriverCustomer::where('customer_id', $customer->id)->where('driver_id', $driver->id)->first(); // To make sure customer is under current driver
+        if($driver_customer) {
+            $pending_orders = Order::where('driver_id', $driver->id)->where('customer_id', $customer->id)->where('status', 'pending')->get();
+        }
         return Inertia::render('Frontend/CustomerDetails', [
-            'customer' => $customer
+            'customer' => $customer,
+            'pendingOrders' => $pending_orders
         ]);
     }
 }
