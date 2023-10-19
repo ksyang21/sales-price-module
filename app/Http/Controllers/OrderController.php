@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderDetails;
+use App\Models\Price;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -15,27 +18,35 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::all();
-        foreach($orders as &$order) {
+        foreach ($orders as &$order) {
             $order['total_prices'] = 0;
-            $order['driver'] = $order->driver;
-            $order['customer'] = $order->customer;
-            $order['details'] = $order->details;
-            foreach($order['details'] as &$detail) {
-                $detail['product'] = $detail->product;
+            $order['driver']       = $order->driver;
+            $order['customer']     = $order->customer;
+            $order['details']      = $order->details;
+            foreach ($order['details'] as &$detail) {
+                $detail['product']     = $detail->product;
                 $order['total_prices'] += $detail->price * $detail->quantity;
             }
         }
         return Inertia::render('Admin/OrdersListing', [
-            'orders' => $orders
+            'orders' => $orders,
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Customer $customer)
     {
-        //
+        $products = Product::all();
+        foreach ($products as &$product) {
+            $price            = Price::where('customer_id', $customer->id)->where('product_id', $product->id)->first();
+            $product['special_price'] = $price ?? [];
+        }
+        return Inertia::render('Frontend/NewOrder', [
+            'customer' => $customer,
+            'products' => $products,
+        ]);
     }
 
     /**
@@ -51,14 +62,14 @@ class OrderController extends Controller
      */
     public function show(string $id)
     {
-        $order = Order::find($id);
+        $order         = Order::find($id);
         $order_details = OrderDetails::where('order_id', $id)->get();
-        foreach($order_details as &$detail) {
+        foreach ($order_details as &$detail) {
             $detail['product'] = $detail->product;
         }
         return Inertia::render('Admin/OrderDetails', [
-            'order' => $order,
-            'details' => $order_details
+            'order'   => $order,
+            'details' => $order_details,
         ]);
     }
 
@@ -86,27 +97,28 @@ class OrderController extends Controller
         //
     }
 
-    public function completeOrder(Order $order) {
+    public function completeOrder(Order $order)
+    {
         $data = [
-            'status' => 'completed'
+            'status' => 'completed',
         ];
         $order->update($data);
 
         $orders = Order::where('driver_id', $order->driver_id)->get();
-        foreach($orders as &$order) {
+        foreach ($orders as &$order) {
             $order['total_price'] = 0;
-            $order['details'] = $order->details;
-            $order['customer'] = $order->customer;
-            foreach($order['details'] as $detail) {
+            $order['details']     = $order->details;
+            $order['customer']    = $order->customer;
+            foreach ($order['details'] as $detail) {
                 $order['total_price'] += $detail['price'];
             }
         }
         return response()->json([
             'status' => 1,
-            'data' => [
-                'msg' => 'Order completed!',
-                'orders' => $orders
-            ]
+            'data'   => [
+                'msg'    => 'Order completed!',
+                'orders' => $orders,
+            ],
         ]);
     }
 }

@@ -27,7 +27,7 @@ let todayDate = new Date().toLocaleDateString()
                     <p class="text-xl">Pending Orders: {{pendingOrders.length}}</p>
                 </div>
                 <div class="flex justify-center mt-6 mb-12">
-                    <Link :href="route('new_order', customer.id)" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white">
+                    <Link :href="route('order.create', customer.id)" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white">
                         New Order
                     </Link>
                 </div>
