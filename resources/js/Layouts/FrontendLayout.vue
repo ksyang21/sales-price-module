@@ -26,22 +26,17 @@ const showingNavigationDropdown = ref(false);
                                     />
                                 </Link>
                             </div>
-                            <div class="fixed inset-x-0 bottom-0 p-4 bg-gray-900 text-white">
+                            <div class="fixed inset-x-0 bottom-0 p-4 bg-white text-gray-500">
                                 <div class="container mx-auto">
                                     <div class="flex justify-between">
-                                        <button
-                                            class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white disabled:bg-gray-500"
-                                            disabled>
-                                            Home
-                                        </button>
-                                        <button class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white">
+                                        <p>Home</p>
+                                        <NavLink :href="route('frontend_dashboard',$page.props.auth.user.id)" :active="route().current('frontend_dashboard')">
+                                            Customers
+                                        </NavLink>
+                                        <NavLink :href="route('frontend_dashboard',$page.props.auth.user.id)" :active="route().current('frontend_dashboard')">
                                             Delivery
-                                        </button>
-                                        <button
-                                            class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white disabled:bg-gray-500"
-                                            disabled>
-                                            Settings
-                                        </button>
+                                        </NavLink>
+                                        <p>Settings</p>
                                     </div>
                                 </div>
                             </div>
