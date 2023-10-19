@@ -19,13 +19,13 @@ class CustomerController extends Controller
     public function index(): \Inertia\Response
     {
         $customers = Customer::all();
-        foreach($customers as &$customer) {
-            $driver_customer = DriverCustomer::where('customer_id', $customer->id)->first();
-            $driver = $driver_customer->driver ?? [];
+        foreach ($customers as &$customer) {
+            $driver_customer    = DriverCustomer::where('customer_id', $customer->id)->first();
+            $driver             = $driver_customer->driver ?? [];
             $customer['driver'] = $driver;
         }
         return Inertia::render('Admin/CustomerManagement', [
-            'customers' => $customers
+            'customers' => $customers,
         ]);
     }
 
@@ -43,26 +43,26 @@ class CustomerController extends Controller
     public function store(Request $request): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
         $validator = Validator::make($request->all(), [
-            'name' => [
+            'name'    => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('customers', 'name')
+                Rule::unique('customers', 'name'),
             ],
             'address' => 'required|string',
         ]);
 
-        if($validator->fails()) {
+        if ($validator->fails()) {
             return Inertia::render('Admin/AddCustomer', [
-                'errors' => $validator->errors()->all()
+                'errors' => $validator->errors()->all(),
             ]);
         }
 
         $data = $validator->getData();
 
         $customer = Customer::create([
-            'name' => $data['name'],
-            'address' => $data['address']
+            'name'    => $data['name'],
+            'address' => $data['address'],
         ]);
 
         return Redirect::route('customer_management')->with('success', 'Customer added!');
@@ -73,17 +73,22 @@ class CustomerController extends Controller
      */
     public function show(string $id)
     {
-        $customer = Customer::find($id);
-        $prices = $customer->prices;
-        $driver_customer = $customer->driverCustomer;
+        $customer           = Customer::find($id);
+        $prices             = $customer->prices;
+        $driver_customer    = $customer->driverCustomer;
         $customer['driver'] = $driver_customer->driver ?? [];
-        foreach($prices as &$price) {
+        $all_drivers        = User::whereHas('roles', function ($query) {
+            $query->where('name', 'driver');
+        })->get();
+        foreach ($prices as &$price) {
             $price['product'] = $price->product;
         }
 
         return Inertia::render('Admin/CustomerDetails', [
-           'customer' => $customer,
-           'prices' => $prices
+            'customer' => $customer,
+            'prices'   => $prices,
+            'drivers'  => $all_drivers,
+            'driverCustomer' => $driver_customer ?? [],
         ]);
     }
 
@@ -109,7 +114,7 @@ class CustomerController extends Controller
     public function destroy(string $id)
     {
         $customer = Customer::find($id);
-        if($customer) {
+        if ($customer) {
             $customer->delete();
             return Redirect::route('customer_management')->with('success', 'Customer removed');
         } else {

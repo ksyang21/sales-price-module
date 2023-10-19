@@ -62,6 +62,8 @@ Route::middleware(['role:admin'])->group(function () {
     Route::delete('/price/{id}', [PriceController::class, 'destroy'])->name('price.destroy');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
+    Route::post('/driver_customer', [\App\Http\Controllers\DriverCustomerController::class, 'store'])->name('driver_customer.create');
+    Route::put('/driver_customer/{driverCustomer}', [\App\Http\Controllers\DriverCustomerController::class, 'update'])->name('driver_customer.update');
 });
 Route::middleware(['role:driver'])->group(function() {
    Route::get('/frontend_dashboard/{id}', [DriverController::class, 'show'])->name('frontend_dashboard');
