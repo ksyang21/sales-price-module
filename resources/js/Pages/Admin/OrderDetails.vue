@@ -15,7 +15,7 @@ const props = defineProps({
 let totalPrice = 0
 let totalQuantity = 0
 for(let detail of props.details) {
-    totalPrice += detail.price
+    totalPrice += (detail.price * detail.quantity)
     totalQuantity += detail.quantity
 }
 </script>
@@ -64,13 +64,13 @@ for(let detail of props.details) {
                                 {{ detail.product.name }}
                             </th>
                             <td class="px-6 py-4">
-                                {{ detail.price.toFixed(2) }}
+                                $ {{ detail.price.toFixed(2) }}
                             </td>
                             <td class="px-6 py-4 ">
                                 {{ detail.quantity }}
                             </td>
                             <td class="px-6 py-4 ">
-                                {{ (detail.price * detail.quantity).toFixed(2) }}
+                                $ {{ (detail.price * detail.quantity).toFixed(2) }}
                             </td>
                             <td class="px-6 py-4 flex">
                                 <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ml-3">Edit
@@ -91,7 +91,7 @@ for(let detail of props.details) {
                             <th scope="row" class="px-6 py-4 text-base">Total</th>
                             <td class="px-6 py-4"></td>
                             <td class="px-6 py-4">{{totalQuantity}}</td>
-                            <td class="px-6 py-4">{{totalPrice.toFixed(2)}}</td>
+                            <td class="px-6 py-4">$ {{totalPrice.toFixed(2)}}</td>
                             <td></td>
                         </tr>
                         </tfoot>

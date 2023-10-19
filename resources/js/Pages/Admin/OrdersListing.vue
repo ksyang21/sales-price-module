@@ -75,7 +75,7 @@ if(errorMessage.value) {
                                 {{ order.details.length }}
                             </td>
                             <td class="px-6 py-4">
-                                {{ order.total_prices.toFixed(2) }}
+                                $ {{ order.total_prices.toFixed(2) }}
                             </td>
                             <td class="px-6 py-4 flex">
                                 <Link

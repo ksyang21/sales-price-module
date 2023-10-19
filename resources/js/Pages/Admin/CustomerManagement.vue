@@ -41,6 +41,9 @@ if (successMessage.value) {
                                 Address
                             </th>
                             <th scope="col" class="px-6 py-3">
+                                Driver
+                            </th>
+                            <th scope="col" class="px-6 py-3">
                                 Action
                             </th>
                         </tr>
@@ -54,6 +57,9 @@ if (successMessage.value) {
                             </th>
                             <td class="px-6 py-4">
                                 {{ customer.address }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ customer.driver.name ? customer.driver.name : '-' }}
                             </td>
                             <td class="px-6 py-4">
                                 <Link

@@ -17,6 +17,7 @@ defineProps({
         required: true,
     },
 });
+
 </script>
 
 <template>
@@ -78,7 +79,8 @@ defineProps({
                     </div>
                 </Link>
                 <Link
-                    :href="route('frontend_dashboard')"
+                    v-if="$page.props.auth.user"
+                    :href="route('frontend_dashboard', $page.props.auth.user.id)"
                     class="rounded-sm border-gray-500 bg-gray-500 p-6 mx-6"
                 >
                     <div class="flex flex-col">

@@ -53,7 +53,7 @@ if (successMessage.value) {
                                 {{ product.name }}
                             </th>
                             <td class="px-6 py-4">
-                                {{ parseFloat(product.price).toFixed(2) }}
+                                $ {{ parseFloat(product.price).toFixed(2) }}
                             </td>
                             <td class="px-6 py-4">
                                 <Link

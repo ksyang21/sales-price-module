@@ -30,7 +30,7 @@ if (successMessage.value) {
                 <div class="bg-white rounded-md px-6 border-gray-200">
                     <div class="border-b-2 py-3 flex items-center">
                         <p class="text-2xl">Product Name : {{ product.name }}</p>
-                        <p class="text-xl ml-auto">Original Price : {{product.price}}</p>
+                        <p class="text-xl ml-auto">Original Price : $ {{product.price}}</p>
                     </div>
                     <div class="py-3">
                         <div class="mt-3 mb-6">
@@ -63,7 +63,7 @@ if (successMessage.value) {
                                     </th>
                                     <td class="px-6 py-4">
                                         <span class="text-gray-200" v-if="parseFloat(price.price) === 0.00">FOC</span>
-                                        <span v-else>{{ parseFloat(price.price).toFixed(2) }}</span>
+                                        <span v-else>$ {{ parseFloat(price.price).toFixed(2) }}</span>
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ price.max_stock }}

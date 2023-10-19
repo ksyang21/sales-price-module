@@ -23,4 +23,9 @@ class Customer extends Model
     {
         return $this->hasMany(Price::class);
     }
+
+    public function driverCustomer(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(DriverCustomer::class);
+    }
 }

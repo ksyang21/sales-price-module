@@ -30,14 +30,23 @@ if (successMessage.value) {
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white rounded-md px-6 border-gray-200">
                     <div class="border-b-2 py-3 flex items-center">
-                        <p class="text-2xl">Customer Name : {{ customer.name }}</p>
-                        <p class="text-xl ml-auto">Total {{ prices.length }} record(s) found</p>
+                        <div class="flex flex-col justify-center">
+                            <p class="text-2xl">Customer Name : {{ customer.name }}</p>
+                            <p v-show="customer.driver.name">Driver : {{ customer.driver.name}}</p>
+                        </div>
+                        <p class=" ml-auto">Total {{ prices.length }} record(s) found</p>
                     </div>
                     <div class="py-3">
                         <div class="mt-3 mb-6">
                             <Link :href="route('price.customer.create', customer.id)"
                                   class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600">Add Price
                             </Link>
+                            <Link :href="route('price.customer.create', customer.id)"
+                                  v-if="!customer.driver.name"
+                                  class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600 ml-2">Assign Driver</Link>
+                            <Link :href="route('price.customer.create', customer.id)"
+                                  v-else
+                                  class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600 ml-2">Change Driver</Link>
                         </div>
                         <div class="relative overflow-x-auto">
                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -66,7 +75,7 @@ if (successMessage.value) {
                                         {{ price.product.name }}
                                     </th>
                                     <td class="px-6 py-4">
-                                        {{ parseFloat(price.price).toFixed(2) }}
+                                        $ {{ parseFloat(price.price).toFixed(2) }}
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ price.max_stock }}

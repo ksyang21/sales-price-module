@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\DriverCustomer;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
@@ -17,6 +19,11 @@ class CustomerController extends Controller
     public function index(): \Inertia\Response
     {
         $customers = Customer::all();
+        foreach($customers as &$customer) {
+            $driver_customer = DriverCustomer::where('customer_id', $customer->id)->first();
+            $driver = $driver_customer->driver ?? [];
+            $customer['driver'] = $driver;
+        }
         return Inertia::render('Admin/CustomerManagement', [
             'customers' => $customers
         ]);
@@ -68,6 +75,8 @@ class CustomerController extends Controller
     {
         $customer = Customer::find($id);
         $prices = $customer->prices;
+        $driver_customer = $customer->driverCustomer;
+        $customer['driver'] = $driver_customer->driver ?? [];
         foreach($prices as &$price) {
             $price['product'] = $price->product;
         }

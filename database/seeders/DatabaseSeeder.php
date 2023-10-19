@@ -46,7 +46,7 @@ class DatabaseSeeder extends Seeder
 
         $drivers = User::where('id', '>', 1)->get();
         foreach ($drivers as $driver) {
-            for ($i = ($driver->id - 2) * 5 + 1; $i <= ($driver->id - 1) * 5; $i++) {
+            for ($i = ($driver->id - 2) * 6 + 1; $i <= ($driver->id - 1) * 6; $i++) {
                 $customer             = Customer::find($i);
                 $driver_customer_data = [
                     'driver_id'   => $driver->id,

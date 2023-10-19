@@ -62,6 +62,8 @@ Route::middleware(['role:admin'])->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
 });
-Route::get('/frontend_dashboard', [DriverController::class, 'index'])->name('frontend_dashboard');
+Route::middleware(['role:driver'])->group(function() {
+   Route::get('/frontend_dashboard/{id}', [DriverController::class, 'show'])->name('frontend_dashboard');
+});
 
 require __DIR__ . '/auth.php';
