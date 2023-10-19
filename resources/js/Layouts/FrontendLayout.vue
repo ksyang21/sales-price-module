@@ -30,10 +30,10 @@ const showingNavigationDropdown = ref(false);
                                 <div class="container mx-auto">
                                     <div class="flex justify-between">
                                         <p>Home</p>
-                                        <NavLink :href="route('frontend_dashboard',$page.props.auth.user.id)" :active="route().current('frontend_dashboard')">
+                                        <NavLink :href="route('frontend_customers')" :active="route().current('frontend_customers')">
                                             Customers
                                         </NavLink>
-                                        <NavLink :href="route('frontend_dashboard',$page.props.auth.user.id)" :active="route().current('frontend_dashboard')">
+                                        <NavLink :href="route('frontend_orders')" :active="route().current('frontend_orders')">
                                             Delivery
                                         </NavLink>
                                         <p>Settings</p>

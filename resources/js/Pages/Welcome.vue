@@ -69,7 +69,7 @@ defineProps({
                 </svg>
             </div>
 
-            <div class="flex justify-center items-center mt-16">
+            <div class="flex justify-center items-center mt-16" v-if="$page.props.auth.user">
                 <Link
                     :href="route('driver_management')"
                     class="rounded-sm border-gray-500 bg-gray-500 p-6 mx-6"
@@ -79,8 +79,7 @@ defineProps({
                     </div>
                 </Link>
                 <Link
-                    v-if="$page.props.auth.user"
-                    :href="route('frontend_dashboard', $page.props.auth.user.id)"
+                    :href="route('frontend_orders')"
                     class="rounded-sm border-gray-500 bg-gray-500 p-6 mx-6"
                 >
                     <div class="flex flex-col">

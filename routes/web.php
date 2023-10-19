@@ -23,10 +23,10 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
+        'canLogin'       => Route::has('login'),
+        'canRegister'    => Route::has('register'),
         'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+        'phpVersion'     => PHP_VERSION,
     ]);
 })->name('home');
 
@@ -65,8 +65,9 @@ Route::middleware(['role:admin'])->group(function () {
     Route::post('/driver_customer', [\App\Http\Controllers\DriverCustomerController::class, 'store'])->name('driver_customer.create');
     Route::put('/driver_customer/{driverCustomer}', [\App\Http\Controllers\DriverCustomerController::class, 'update'])->name('driver_customer.update');
 });
-Route::middleware(['role:driver'])->group(function() {
-   Route::get('/frontend_dashboard/{id}', [DriverController::class, 'show'])->name('frontend_dashboard');
+Route::middleware(['role:driver'])->group(function () {
+    Route::get('/frontend_customer', [DriverController::class, 'listCustomers'])->name('frontend_customers');
+    Route::get('/frontend_orders', [DriverController::class, 'listOrders'])->name('frontend_orders');
 });
 
 require __DIR__ . '/auth.php';

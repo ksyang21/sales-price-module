@@ -85,4 +85,28 @@ class OrderController extends Controller
     {
         //
     }
+
+    public function completeOrder(Order $order) {
+        $data = [
+            'status' => 'completed'
+        ];
+        $order->update($data);
+
+        $orders = Order::where('driver_id', $order->driver_id)->get();
+        foreach($orders as &$order) {
+            $order['total_price'] = 0;
+            $order['details'] = $order->details;
+            $order['customer'] = $order->customer;
+            foreach($order['details'] as $detail) {
+                $order['total_price'] += $detail['price'];
+            }
+        }
+        return response()->json([
+            'status' => 1,
+            'data' => [
+                'msg' => 'Order completed!',
+                'orders' => $orders
+            ]
+        ]);
+    }
 }

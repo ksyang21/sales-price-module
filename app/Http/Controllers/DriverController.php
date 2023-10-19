@@ -7,6 +7,7 @@ use App\Models\DriverCustomer;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
@@ -93,8 +94,7 @@ class DriverController extends Controller
                 $order['total_price'] += $detail['price'];
             }
         }
-        $path =  Route::current()->getName() === 'frontend_dashboard' ? 'Frontend/Dashboard' : 'Admin/DriverDetails';
-        return Inertia::render($path, [
+        return Inertia::render('Admin/DriverDetails', [
             'orders' => $orders,
             'driver' => $driver,
             'customers' => $customers
@@ -125,5 +125,41 @@ class DriverController extends Controller
         $driver = User::find($id);
         $driver->delete();
         return Redirect::route('driver_management')->with('success', 'Driver removed!');
+    }
+
+    public function listCustomers() {
+        $driver = Auth::user();
+        $driver_customers = DriverCustomer::where('driver_id', $driver->id)->get();
+        $customers = [];
+        foreach($driver_customers as $driver_customer) {
+            $customers[] = Customer::find($driver_customer->id);
+        }
+        return Inertia::render('Frontend/Customers', [
+            'driver' => $driver,
+            'customers' => $customers
+        ]);
+    }
+
+    public function listOrders() {
+        $driver = Auth::user();
+        $driver_customers = DriverCustomer::where('driver_id', $driver->id)->get();
+        $customers = [];
+        foreach($driver_customers as $driver_customer) {
+            $customers[] = Customer::find($driver_customer->id);
+        }
+        $orders = Order::where('driver_id', $driver->id)->get();
+        foreach($orders as &$order) {
+            $order['total_price'] = 0;
+            $order['details'] = $order->details;
+            $order['customer'] = $order->customer;
+            foreach($order['details'] as $detail) {
+                $order['total_price'] += $detail['price'];
+            }
+        }
+        return Inertia::render('Frontend/Orders', [
+            'orders' => $orders,
+            'driver' => $driver,
+            'customers' => $customers
+        ]);
     }
 }
