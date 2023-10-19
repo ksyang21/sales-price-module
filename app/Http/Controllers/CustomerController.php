@@ -121,4 +121,11 @@ class CustomerController extends Controller
             return Redirect::route('customer_management')->with('error', 'Invalid customer ID');
         }
     }
+
+    public function getCustomerDetails(string $id) {
+        $customer = Customer::find($id);
+        return Inertia::render('Frontend/CustomerDetails', [
+            'customer' => $customer
+        ]);
+    }
 }

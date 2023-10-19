@@ -67,6 +67,7 @@ Route::middleware(['role:admin'])->group(function () {
 });
 Route::middleware(['role:driver'])->group(function () {
     Route::get('/frontend_customer', [DriverController::class, 'listCustomers'])->name('frontend_customers');
+    Route::get('/frontend_customer_details/{id}', [CustomerController::class, 'getCustomerDetails'])->name('frontend_customer_details');
     Route::get('/frontend_orders', [DriverController::class, 'listOrders'])->name('frontend_orders');
 });
 
