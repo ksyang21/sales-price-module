@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['role:admin'])->group(function () {
     Route::get('/driver_management', [DriverController::class, 'index'])->name('driver_management');
     Route::get('/create-driver', [DriverController::class, 'create'])->name('driver.create');
+    Route::get('/driver/{id}', [DriverController::class, 'show'])->name('driver.show');
     Route::post('/driver', [DriverController::class, 'store'])->name('driver.store');
     Route::delete('/driver/{id}', [DriverController::class, 'destroy'])->name('driver.destroy');
     Route::get('/customer_management', [CustomerController::class, 'index'])->name('customer_management');

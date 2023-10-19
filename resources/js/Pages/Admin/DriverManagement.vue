@@ -65,7 +65,13 @@ if(errorMessage.value) {
                                 {{ driver.customers.length }}
                             </td>
                             <td class="px-6 py-4 flex">
-                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500">Edit
+                                <Link
+                                    :href="route('driver.show', driver.id)"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500"
+                                >
+                                    View
+                                </Link>
+                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ml-3">Edit
                                 </button>
                                 <Link
                                     as="button"

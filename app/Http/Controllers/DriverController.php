@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\DriverCustomer;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
@@ -77,6 +79,11 @@ class DriverController extends Controller
     public function show(string $id)
     {
         $driver = User::find($id);
+        $driver_customers = DriverCustomer::where('driver_id', $driver->id)->get();
+        $customers = [];
+        foreach($driver_customers as $driver_customer) {
+            $customers[] = Customer::find($driver_customer->id);
+        }
         $orders = Order::where('driver_id', $id)->get();
         foreach($orders as &$order) {
             $order['total_price'] = 0;
@@ -86,9 +93,11 @@ class DriverController extends Controller
                 $order['total_price'] += $detail['price'];
             }
         }
-        return Inertia::render('Frontend/Dashboard', [
+        $path =  Route::current()->getName() === 'frontend_dashboard' ? 'Frontend/Dashboard' : 'Admin/DriverDetails';
+        return Inertia::render($path, [
             'orders' => $orders,
             'driver' => $driver,
+            'customers' => $customers
         ]);
     }
 
