@@ -1,19 +1,13 @@
 <script setup>
 
-import {Head, Link, usePage} from "@inertiajs/vue3";
+import {Head, Link} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {computed} from "vue";
 
 const props = defineProps({
     products: {
         type: Object,
     },
 });
-
-const successMessage = computed(() => usePage().props.alert.success)
-if (successMessage.value) {
-    alert(successMessage.value)
-}
 
 </script>
 

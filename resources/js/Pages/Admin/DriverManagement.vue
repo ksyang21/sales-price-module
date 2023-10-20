@@ -1,7 +1,6 @@
 <script setup>
 import {Head, Link, usePage} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {computed} from "vue";
 
 const props = defineProps({
     drivers: {
@@ -9,15 +8,6 @@ const props = defineProps({
     },
 });
 
-// Notification messages
-const successMessage = computed(() => usePage().props.alert.success)
-if(successMessage.value) {
-    alert(successMessage.value)
-}
-const errorMessage = computed(() => usePage().props.alert.error)
-if(errorMessage.value) {
-    alert(errorMessage.value)
-}
 </script>
 
 <template>

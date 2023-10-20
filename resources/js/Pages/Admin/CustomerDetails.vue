@@ -1,7 +1,7 @@
 <script setup>
-import {Head, Link, router, usePage} from "@inertiajs/vue3";
+import {Head, Link, router} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {computed, reactive} from "vue";
+import {reactive} from "vue";
 
 const props = defineProps({
     customer: {
@@ -25,10 +25,6 @@ const form = reactive({
     customer_id: props.customer.id,
     driver_id: props.customer.driver ? props.customer.driver.id : -1
 })
-const successMessage = computed(() => usePage().props.alert.success)
-if (successMessage.value) {
-    alert(successMessage.value)
-}
 
 function updateDriver() {
     if(form.driver_id > 0 && form.customer_id > 0) {

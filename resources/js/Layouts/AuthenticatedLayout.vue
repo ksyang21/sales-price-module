@@ -1,13 +1,42 @@
 <script setup>
-import { ref } from 'vue';
+import {computed, inject, ref} from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import {Link, usePage} from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
+const Swal = inject('$swal')
+
+// Notification messages
+const successMessage = computed(() => usePage().props.alert.success)
+if(successMessage.value) {
+    Swal.fire({
+        title: 'Done!',
+        text: successMessage.value,
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false,
+        allowEscapeKey: false,
+        position: 'top-end',
+        toast: true
+    })
+}
+const errorMessage = computed(() => usePage().props.alert.error)
+if(errorMessage.value) {
+    Swal.fire({
+        title: 'Unexpected error :(',
+        text: errorMessage.value,
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false,
+        allowEscapeKey: false,
+        position: 'top-end',
+        toast: true
+    })
+}
 </script>
 
 <template>
