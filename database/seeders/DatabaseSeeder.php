@@ -103,12 +103,20 @@ class DatabaseSeeder extends Seeder
                         }
                         OrderDetails::create($order_details);
                     } else {
-                        $quantity = $purchase_quantity + (intval($purchase_quantity / $price->foc_quantity) * $price->foc_gift);
+                        $foc_quantity = intval($purchase_quantity / $price->foc_quantity) * $price->foc_gift;
                         $order_details = [
                             'order_id'   => $order->id,
                             'product_id' => $product->id,
                             'price'      => $price->price,
-                            'quantity'   => $quantity,
+                            'quantity'   => $purchase_quantity,
+                        ];
+                        OrderDetails::create($order_details);
+                        $order_details = [
+                            'order_id'   => $order->id,
+                            'product_id' => $product->id,
+                            'price'      => 0,
+                            'quantity'   => $foc_quantity,
+                            'is_foc' => 1
                         ];
                         OrderDetails::create($order_details);
                     }

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreign('product_id')->references('id')->on('products')->cascadeOnDelete();
             $table->unsignedFloat('price');
             $table->unsignedBigInteger('quantity');
+            $table->tinyInteger('is_foc')->comment('determines foc module gift');
             $table->timestamps();
         });
     }

@@ -87,23 +87,32 @@ class OrderController extends Controller
             $price          = Price::where('customer_id', $customer_id)->where('product_id', $product['id'])->first();
             if ($price) {
                 if ($price->type === 'foc module') { // foc module
-                    $quantity = $total_quantity + (intval($total_quantity / $price->foc_quantity) * $price->foc_gift);
-                    $price    = $total_quantity * $price->price;
+//                    $price    = $total_quantity * $price->price;
                     OrderDetails::create([
                         'order_id'   => $order->id,
                         'product_id' => $product['id'],
-                        'price'      => $price,
-                        'quantity'   => $quantity,
+                        'price'      => $price->price,
+                        'quantity'   => $total_quantity,
+                        'is_foc'     => 0,
+                    ]);
+                    $foc_gift = intval($total_quantity / $price->foc_quantity) * $price->foc_gift;
+                    OrderDetails::create([
+                        'order_id'   => $order->id,
+                        'product_id' => $product['id'],
+                        'price'      => 0,
+                        'quantity'   => $foc_gift,
+                        'is_foc'     => 1,
                     ]);
                 } else { // special price module
                     if ($total_quantity <= $price->max_stock) {
                         $quantity = $total_quantity;
-                        $price    = $quantity * $price->price;
+//                        $price    = $quantity * $price->price;
                         OrderDetails::create([
                             'order_id'   => $order->id,
                             'product_id' => $product['id'],
-                            'price'      => $price,
+                            'price'      => $price->price,
                             'quantity'   => $quantity,
+                            'is_foc'     => 0,
                         ]);
                     } else {
                         $special_price    = $price->price;
@@ -113,6 +122,7 @@ class OrderController extends Controller
                             'product_id' => $product['id'],
                             'price'      => $special_price,
                             'quantity'   => $special_quantity,
+                            'is_foc'     => 0,
                         ]);
 
                         $CurrentProduct    = $price->product;
@@ -123,6 +133,7 @@ class OrderController extends Controller
                             'product_id' => $product['id'],
                             'price'      => $original_price,
                             'quantity'   => $original_quantity,
+                            'is_foc'     => 0,
                         ]);
                     }
                 }
@@ -133,6 +144,7 @@ class OrderController extends Controller
                     'product_id' => $product['id'],
                     'price'      => $CurrentProduct->price,
                     'quantity'   => $product['quantity'],
+                    'is_foc'     => 0,
                 ]);
             }
         }
@@ -216,7 +228,7 @@ class OrderController extends Controller
         $total_price   = 0;
         foreach ($order_details as &$detail) {
             $detail['product'] = $detail->product;
-            $total_price       += $detail->price;
+            $total_price       += $detail->price * $detail->quantity;
         }
         return Inertia::render('Frontend/ConfirmOrder', [
             'order'    => $order,
@@ -230,7 +242,7 @@ class OrderController extends Controller
     {
         $order = Order::find($id);
         $order->update([
-            'status' => 'pending'
+            'status' => 'pending',
         ]);
         return Redirect::route('frontend_orders')->with('success', 'Order confirmed!');
     }

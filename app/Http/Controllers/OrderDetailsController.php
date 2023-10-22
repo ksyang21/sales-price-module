@@ -70,10 +70,10 @@ class OrderDetailsController extends Controller
 
         $data = $validator->getData();
 
-        $quantity = intval($data['quantity']);
+        $quantity      = intval($data['quantity']);
         $order_details = OrderDetails::find($data['id']);
-        $order = $order_details->order;
-        $product = $order_details->product;
+        $order         = $order_details->order;
+        $product       = $order_details->product;
 
         $price = Price::where('product_id', $product->id)->where('customer_id', $order->customer_id)->first();
 
@@ -81,22 +81,31 @@ class OrderDetailsController extends Controller
         if ($price) {
             OrderDetails::where('product_id', $product->id)->delete();
             if ($price->type === 'foc module') { // foc module
-                $quantity = $quantity + (intval($quantity / $price->foc_quantity) * $price->foc_gift);
-                $price    = $quantity * $price->price;
+//                $price    = $quantity * $price->price;
                 OrderDetails::create([
                     'order_id'   => $order->id,
                     'product_id' => $product['id'],
                     'price'      => $price,
                     'quantity'   => $quantity,
+                    'is_foc'     => 0,
+                ]);
+                $foc_gift = intval($quantity / $price->foc_quantity) * $price->foc_gift;
+                OrderDetails::create([
+                    'order_id'   => $order->id,
+                    'product_id' => $product['id'],
+                    'price'      => 0,
+                    'quantity'   => $foc_gift,
+                    'is_foc'     => 1,
                 ]);
             } else { // special price module
                 if ($quantity <= $price->max_stock) {
-                    $price    = $quantity * $price->price;
+                    $price = $quantity * $price->price;
                     OrderDetails::create([
                         'order_id'   => $order->id,
                         'product_id' => $product['id'],
                         'price'      => $price,
                         'quantity'   => $quantity,
+                    'is_foc'     => 0,
                     ]);
                 } else {
                     $special_price    = $price->price;
@@ -106,6 +115,7 @@ class OrderDetailsController extends Controller
                         'product_id' => $product['id'],
                         'price'      => $special_price,
                         'quantity'   => $special_quantity,
+                    'is_foc'     => 0,
                     ]);
 
                     $original_quantity = $quantity - $price->max_stock;
@@ -115,6 +125,7 @@ class OrderDetailsController extends Controller
                         'product_id' => $product['id'],
                         'price'      => $original_price,
                         'quantity'   => $original_quantity,
+                    'is_foc'     => 0,
                     ]);
                 }
             }

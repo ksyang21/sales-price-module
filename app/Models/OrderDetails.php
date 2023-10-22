@@ -15,7 +15,8 @@ class OrderDetails extends Model
         'order_id',
         'product_id',
         'price',
-        'quantity'
+        'quantity',
+        'is_foc'
     ];
     public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
