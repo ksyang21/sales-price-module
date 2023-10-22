@@ -75,9 +75,12 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product)
+    public function edit(string $id)
     {
-        //
+        $product = Product::find($id);
+        return Inertia::render('Admin/EditProduct', [
+            'product' => $product
+        ]);
     }
 
     /**
@@ -85,7 +88,28 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|numeric|min:0',
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0'
+        ]);
+
+        if($validator->fails()) {
+            $product = Product::find($request['id']);
+            return Inertia::render('Admin/EditProduct', [
+                'errors' => $validator->errors()->all(),
+                'product' => $product
+            ]);
+        }
+
+        $data = $validator->getData();
+        $product = Product::find($data['id']);
+        $product->update([
+            'name' => $data['name'],
+            'price' => $data['price']
+        ]);
+
+        return Redirect::route('products')->with('success', 'Product details updated!');
     }
 
     /**

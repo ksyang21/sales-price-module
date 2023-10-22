@@ -24,6 +24,10 @@ function removeProduct(product) {
         }
     })
 }
+
+function editProduct(product) {
+    router.get(`/edit_product/${product.id}`)
+}
 </script>
 
 <template>
@@ -72,7 +76,7 @@ function removeProduct(product) {
                                 >
                                     View
                                 </Link>
-                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ml-3">
+                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ml-3" @click="editProduct(product)">
                                     Edit
                                 </button>
                                 <button class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3" @click="removeProduct(product)">Remove</button>
