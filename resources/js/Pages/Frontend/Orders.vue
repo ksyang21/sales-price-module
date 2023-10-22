@@ -91,6 +91,9 @@ function calculateProgress() {
                                         v-if="isDelivering && order.status === 'cancelled'">{{
                                             order.status.toUpperCase()
                                         }}</span>
+                                    <span
+                                        class="bg-red-300 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded ml-4"
+                                        v-if="isDelivering && order.status === 'cart'">PENDING CONFIRMATION</span>
                                 </div>
                             </div>
                         </li>
