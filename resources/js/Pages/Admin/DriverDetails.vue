@@ -61,8 +61,6 @@ const props = defineProps({
                                 >
                                     View
                                 </Link>
-                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ml-3">Edit
-                                </button>
                                 <Link
                                     as="button"
                                     method="delete"
@@ -119,15 +117,13 @@ const props = defineProps({
                                     >
                                         View
                                     </Link>
-                                    <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ml-3">
-                                        Edit
-                                    </button>
                                     <Link
                                         as="button"
                                         method="delete"
+                                        :href="route('order.destroy', order.id)"
                                         class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3"
                                     >
-                                        Remove
+                                        Cancel
                                     </Link>
                                 </td>
                             </tr>
