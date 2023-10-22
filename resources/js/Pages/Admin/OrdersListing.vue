@@ -12,15 +12,15 @@ const props = defineProps({
 const Swal = inject('$swal')
 
 function cancelOrder(order) {
-  Swal.fire({
-    title: `Cancel order #${order.id}?`,
-    icon: 'info',
-    showCancelButton: true
-  }).then((result) => {
-    if(result.isConfirmed) {
-      router.delete(`/order/${order.id}`)
-    }
-  })
+    Swal.fire({
+        title: `Cancel order #${order.id}?`,
+        icon: 'info',
+        showCancelButton: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.delete(`/order/${order.id}`)
+        }
+    })
 }
 </script>
 
@@ -83,7 +83,8 @@ function cancelOrder(order) {
                                 >
                                     View
                                 </Link>
-                                <button class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3" @click="cancelOrder(order)">
+                                <button class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3"
+                                        @click="cancelOrder(order)">
                                     Cancel
                                 </button>
                             </td>
