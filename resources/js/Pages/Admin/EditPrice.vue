@@ -8,57 +8,36 @@ const props = defineProps({
     customer: {
         type: Object,
     },
-    products: {
+    product: {
         type: Object,
     },
+    errors: Object,
+    price: Object
 })
 
 const form = reactive({
-    source: 'customer',
-    customer: props.customer.id,
-    product: 0,
-    price: 0.00,
-    max_stock: 0,
-    foc: false
+    id: props.price.id,
+    price: props.price.type === 'foc module' ? 0 : props.price.price,
+    max_stock: props.price.max_stock,
+    foc: props.price.type === 'foc module'
 })
 
-let foc = ref(false)
-
-let canSubmit = ref(true)
-
-let currentProduct = {}
-
-function getProduct() {
-    let productID = form.product
-    currentProduct = props.products.find((product) => {
-        return product.id === productID
-    })
-    if(!foc.value) {
-        form.price = currentProduct.price
-    }
-}
+let foc = ref(props.price.type === 'foc module')
 
 function resetPrice() {
-    form.price = 0
-    form.foc = foc.value
     if (foc.value) {
+        form.price = 0.00
         form.max_stock = 0
+        form.foc = true
     } else {
-        if(currentProduct.id !== undefined) {
-            form.price = currentProduct.price
-        }
+        form.price = props.product.price
+        form.max_stock = props.price.max_stock
+        form.foc = false
     }
-}
-
-function validateForm() {
-    canSubmit.value = (form.customer > 0 && form.product > 0)
 }
 
 function handleSubmit() {
-    validateForm()
-    if (canSubmit.value) {
-        router.post('/price', form)
-    }
+    router.put(`/edit_price/${props.price.id}`, form)
 }
 
 </script>
@@ -69,7 +48,7 @@ function handleSubmit() {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Add Price</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Edit Price</h2>
         </template>
         <div class="py-8">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -77,19 +56,7 @@ function handleSubmit() {
                 <form class="w-full" @submit.prevent="handleSubmit">
                     <div class="p-6 lg:p-8 bg-white mt-2">
                         <div class="w-full px-3 mb-3">
-                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                                   for="products">Products</label>
-                            <select
-                                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                v-model="form.product"
-                                @change="getProduct"
-                                id="products"
-                            >
-                                <option v-for="product in products" :value="product.id">{{ product.name }}
-                                </option>
-                            </select>
-                            <p class="text-red-600 text-xs italic" v-if="!canSubmit && !form.product">Please select
-                                product</p>
+                            <p class="text-xl">Product : {{ product.name }}</p>
                         </div>
                         <div class="w-full px-3 mb-3">
                             <div class="flex items-center">
@@ -108,10 +75,8 @@ function handleSubmit() {
                         <div class="w-full px-3 mb-3" v-if="!foc">
                             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold"
                                    for="stock">Max Stock</label>
-                            <p class="text-gray-300 text-sm">Original price will be used after this customer
-                                purchased more than this number.</p>
+                            <p class="text-gray-300 text-sm">Original price will be used after this customer purchased more than this number.</p>
                             <p class="text-gray-300 text-sm mb-2">Leave 0 if no limit to the discounted price.</p>
-
                             <input
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 id="stock" type="number" placeholder="Maximum count of stock for this product"
@@ -128,7 +93,7 @@ function handleSubmit() {
                                 class="ml-auto px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600"
                                 type="submit"
                             >
-                                Create
+                                Save
                             </button>
                         </div>
                     </div>

@@ -50,6 +50,10 @@ function removePrice(price) {
     })
 }
 
+function editPrice(price) {
+    router.get(`/edit_price/${price.id}`)
+}
+
 </script>
 
 <template>
@@ -121,9 +125,7 @@ function removePrice(price) {
                                         }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500">
-                                            Edit
-                                        </button>
+                                        <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500" @click="editPrice(price, customer)">Edit</button>
                                         <button class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3" @click="removePrice(price)">Remove</button>
                                     </td>
                                 </tr>

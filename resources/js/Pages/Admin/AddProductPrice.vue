@@ -95,8 +95,9 @@ function handleSubmit() {
                         <div class="w-full px-3 mb-3" v-if="!foc">
                             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold"
                                    for="stock">Max Stock</label>
-                            <p class="text-gray-300 text-sm mb-2">Original price will be used after this customer
+                            <p class="text-gray-300 text-sm">Original price will be used after this customer
                                 purchase more than this number.</p>
+                            <p class="text-gray-300 text-sm mb-2">Leave 0 if no limit to the discounted price.</p>
                             <input
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 id="stock" type="number" placeholder="Maximum count of stock for this product"

@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
 class PriceController extends Controller
@@ -98,9 +99,19 @@ class PriceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Price $price)
+    public function edit(string $price_id)
     {
-        //
+        $price         = Price::find($price_id);
+        $customer      = $price->customer;
+        $product       = $price->product;
+        $current_route = Route::current()->getName();
+        if ($current_route === 'price.customer.edit') {
+            return Inertia::render('Admin/EditPrice', [
+                'price'    => $price,
+                'customer' => $customer,
+                'product'  => $product,
+            ]);
+        }
     }
 
     /**
@@ -108,7 +119,33 @@ class PriceController extends Controller
      */
     public function update(Request $request, Price $price)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'id'        => 'required|numeric|min:0',
+            'price'     => 'required|numeric|min:0',
+            'max_stock' => 'required|numeric|min:0|max:100',
+            'foc'       => 'required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return Inertia::render('Admin/EditPrice', [
+                'errors' => $validator->errors()->all(),
+            ]);
+        }
+
+        $data          = $validator->getData();
+        $is_foc_module = $data['foc'];
+        $price         = Price::find($data['id']);
+        $price->update([
+            'price'        => $data['price'],
+            'max_stock'    => $data['max_stock'],
+            'type'         => $is_foc_module ? 'foc module' : 'special price module',
+            'foc_quantity' => $is_foc_module ? 10 : 0,
+            'foc_gift'     => $is_foc_module ? 1 : 0,
+        ]);
+        $customer = $price->customer;
+        $product  = $price->product;
+
+        return Redirect::route('customer.show', $customer->id)->with('success', 'Price details updated!');
     }
 
     /**
