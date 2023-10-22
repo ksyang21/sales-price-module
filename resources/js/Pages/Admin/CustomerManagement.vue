@@ -1,6 +1,7 @@
 <script setup>
-import {Head, Link} from "@inertiajs/vue3";
+import {Head, Link, router} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import {inject} from "vue";
 
 defineProps({
     customers: {
@@ -8,6 +9,19 @@ defineProps({
     },
 });
 
+const Swal = inject('$swal')
+
+function removeCustomer(customer) {
+    Swal.fire({
+        title: `Remove ${customer.name}?`,
+        icon: 'info',
+        showCancelButton: true
+    }).then((result) => {
+        if(result.isConfirmed) {
+            router.delete(`/customer/${customer.id}`)
+        }
+    })
+}
 </script>
 
 <template>
@@ -66,14 +80,7 @@ defineProps({
                                 </Link>
                                 <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ml-3">Edit
                                 </button>
-                                <Link
-                                    as="button"
-                                    method="delete"
-                                    :href="route('customer.destroy', customer.id)"
-                                    class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3"
-                                >
-                                    Remove
-                                </Link>
+                                <button class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3" @click="removeCustomer(customer)">Remove</button>
                             </td>
                         </tr>
                         </tbody>
