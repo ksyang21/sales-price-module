@@ -11,6 +11,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -193,8 +194,7 @@ class OrderController extends Controller
     {
         $order = Order::find($id);
         $order->delete();
-
-        return Redirect::route('frontend_customers')->with('success', 'Order cancelled!');
+        return Redirect::route('orders')->with('success', 'Order cancelled!');
     }
 
     public function completeOrder(Order $order): \Illuminate\Http\JsonResponse
@@ -229,9 +229,9 @@ class OrderController extends Controller
         $customer      = $order->customer;
         $total_price   = 0;
         foreach ($order_details as &$detail) {
-            $detail['product'] = $detail->product;
+            $detail['product']       = $detail->product;
             $detail['special_price'] = Price::where('product_id', $detail['product']->id)->where('customer_id', $customer->id)->first();
-            $total_price       += $detail->price * $detail->quantity;
+            $total_price             += $detail->price * $detail->quantity;
         }
         return Inertia::render('Frontend/ConfirmOrder', [
             'order'    => $order,
@@ -248,5 +248,12 @@ class OrderController extends Controller
             'status' => 'pending',
         ]);
         return Redirect::route('frontend_orders')->with('success', 'Order confirmed!');
+    }
+
+    public function cancelOrder(string $id)
+    {
+        $order = Order::find($id);
+        $order->delete();
+        return Redirect::route('frontend_customers')->with('success', 'Order cancelled!');
     }
 }
