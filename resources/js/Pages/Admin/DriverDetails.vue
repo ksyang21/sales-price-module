@@ -22,12 +22,15 @@ const props = defineProps({
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Customer Management</h2>
+            <div class="flex items-center">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Driver Details</h2>
+                <h2 class="ml-auto">Driver Name : {{ driver.name }}</h2>
+            </div>
         </template>
         <div class="py-8">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <p class="text-xl">Customers</p>
-                <p class="text-sm">Total: {{customers.length}}</p>
+                <p class="text-sm">Total: {{ customers.length }}</p>
                 <div class="relative overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -76,7 +79,7 @@ const props = defineProps({
                 </div>
                 <div class="mt-3">
                     <p class="text-xl">Orders</p>
-                    <p class="text-sm">Total : {{orders.length}}</p>
+                    <p class="text-sm">Total : {{ orders.length }}</p>
                     <div class="relative overflow-x-auto">
                         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                             <thead
@@ -91,6 +94,9 @@ const props = defineProps({
                                 <th scope="col" class="px-6 py-3">
                                     Address
                                 </th>
+                                <td class="px-6 py-4">
+                                    Status
+                                </td>
                                 <th scope="col" class="px-6 py-3">
                                     Action
                                 </th>
@@ -108,6 +114,26 @@ const props = defineProps({
                                 </td>
                                 <td class="px-6 py-4">
                                     {{ order.customer.address }}
+                                </td>
+                                <td class="px-6 py-4">
+                                  <span
+                                      class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded ml-4"
+                                      v-if="order.status === 'completed'">{{
+                                          order.status.toUpperCase()
+                                      }}</span>
+                                    <span
+                                        class="bg-gray-300 text-black text-xs font-medium mr-2 px-2.5 py-0.5 rounded ml-4"
+                                        v-if="order.status === 'pending'">{{
+                                            order.status.toUpperCase()
+                                        }}</span>
+                                    <span
+                                        class="bg-red-300 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded ml-4"
+                                        v-if="order.status === 'cancelled'">{{
+                                            order.status.toUpperCase()
+                                        }}</span>
+                                    <span
+                                        class="bg-red-300 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded ml-4"
+                                        v-if="order.status === 'cart'">TBC</span>
                                 </td>
                                 <td class="px-6 py-4">
                                     <Link
