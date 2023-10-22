@@ -3,6 +3,7 @@
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderDetailsController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -70,6 +71,12 @@ Route::middleware(['role:driver'])->group(function () {
     Route::get('/frontend_customer_details/{id}', [CustomerController::class, 'getCustomerDetails'])->name('frontend_customer_details');
     Route::get('/new_order/{customer}', [OrderController::class, 'create'])->name('order.create');
     Route::get('/frontend_orders', [DriverController::class, 'listOrders'])->name('frontend_orders');
+    Route::post('/place_order', [OrderController::class, 'store'])->name('order.store');
+    Route::get('/confirm_order/{id}', [OrderController::class, 'confirmOrder'])->name('confirm_order');
+    Route::put('/pay_order/{id}', [OrderController::class, 'payOrder'])->name('pay_order');
+    Route::delete('/order/{id}', [OrderController::class, 'destroy'])->name('cancel_order');
+    Route::delete('/order_detail/{id}', [OrderDetailsController::class, 'destroy'])->name('remove_detail');
+    Route::put('/order_detail', [OrderDetailsController::class, 'update'])->name('update_detail');
 });
 
 require __DIR__ . '/auth.php';

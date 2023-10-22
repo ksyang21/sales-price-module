@@ -1,18 +1,19 @@
 <script setup>
 import FrontendLayout from "@/Layouts/FrontendLayout.vue";
-import {Head, Link, router} from "@inertiajs/vue3";
+import {Head, Link, router, usePage} from "@inertiajs/vue3";
 import {computed, inject, reactive, ref, watch} from "vue";
 
 const props = defineProps({
     customer: Object,
-    products: Object
+    products: Object,
+    errors: Object
 })
 
 const cart = reactive({
-    products: []
-});
-
-let canSubmit = ref(true)
+    products: [],
+    customer_id: parseInt(props.customer.id),
+    driver_id: usePage().props.auth.user.id
+})
 
 let cartTotalPrice = computed(() => {
     let total = 0.00;
@@ -51,48 +52,76 @@ async function addToCart(product) {
         return item.id === product.id
     })
     if (itemAdded) {
-        if (product.special_price.max_stock !== undefined) {
-            let maxStockAllowed = parseInt(product.special_price.max_stock)
-            if (quantity + itemAdded.discount.quantity <= maxStockAllowed) {
-                itemAdded.discount.quantity = quantity + itemAdded.discount.quantity
+        if (product.special_price.id !== undefined) {
+            if (product.special_price.type === 'special price module') {
+                let maxStockAllowed = parseInt(product.special_price.max_stock)
+                if (quantity + itemAdded.discount.quantity <= maxStockAllowed) {
+                    itemAdded.discount.quantity = quantity + itemAdded.discount.quantity
+                } else {
+                    itemAdded.discount.quantity = maxStockAllowed
+                    itemAdded.original.quantity = quantity + itemAdded.discount.quantity - maxStockAllowed
+                }
             } else {
-                itemAdded.discount.quantity = maxStockAllowed
-                itemAdded.original.quantity = quantity + itemAdded.discount.quantity - maxStockAllowed
+                let focQuantity = parseInt(product.special_price.foc_quantity)
+                let focGift = parseInt(product.special_price.foc_gift)
+                let totalQuantity = quantity + itemAdded.discount.quantity
+                itemAdded.discount.quantity = totalQuantity
+                itemAdded.free = parseInt(totalQuantity / focQuantity) * focGift
             }
         } else {
             let currentItemQuantity = product.original.quantity
             itemAdded.quantity = quantity + parseInt(currentItemQuantity)
         }
     } else {
-        if (product.special_price.max_stock !== undefined) {
-            let maxStockAllowed = parseInt(product.special_price.max_stock)
-            if (quantity <= maxStockAllowed) {
+        if (product.special_price.id !== undefined) {
+            if (product.special_price.type === 'special price module') {
+                let maxStockAllowed = parseInt(product.special_price.max_stock)
+                if (quantity <= maxStockAllowed) {
+                    cart.products.push({
+                        id: product.id,
+                        name: product.name,
+                        discount: {
+                            quantity: quantity,
+                            price: parseFloat(product.special_price.price),
+
+                        },
+                        original: {
+                            quantity: 0,
+                            price: parseFloat(product.price)
+                        },
+                        free: 0
+                    })
+                } else {
+                    cart.products.push({
+                        id: product.id,
+                        name: product.name,
+                        discount: {
+                            quantity: maxStockAllowed,
+                            price: parseFloat(product.special_price.price),
+
+                        },
+                        original: {
+                            quantity: quantity - maxStockAllowed,
+                            price: parseFloat(product.price)
+                        },
+                        free: 0
+                    })
+                }
+            } else {
+                let focQuantity = parseInt(product.special_price.foc_quantity)
+                let focGift = parseInt(product.special_price.foc_gift)
                 cart.products.push({
                     id: product.id,
                     name: product.name,
                     discount: {
                         quantity: quantity,
-                        price: parseFloat(product.special_price.price),
-
+                        price: parseFloat(product.price),
                     },
                     original: {
                         quantity: 0,
                         price: parseFloat(product.price)
-                    }
-                })
-            } else {
-                cart.products.push({
-                    id: product.id,
-                    name: product.name,
-                    discount: {
-                        quantity: maxStockAllowed,
-                        price: parseFloat(product.special_price.price),
-
                     },
-                    original: {
-                        quantity: quantity - maxStockAllowed,
-                        price: parseFloat(product.price)
-                    }
+                    free: parseInt(quantity / focQuantity) * focGift
                 })
             }
         } else {
@@ -107,7 +136,8 @@ async function addToCart(product) {
                 original: {
                     quantity: quantity,
                     price: parseFloat(product.price)
-                }
+                },
+                free: 0
             })
         }
     }
@@ -116,18 +146,12 @@ async function addToCart(product) {
     cartTotalPrice.value = calculateCartTotalPrice();
 }
 
-// function validateForm() {
-//     canSubmit.value = (cart.products !== [])
-// }
-//
-// function handleSubmit() {
-//     validateForm()
-//     if (canSubmit.value) {
-//         router.post('/customer', form)
-//     }
-// }
-
 function placeOrder() {
+    if (cart.products.length) {
+        router.post('/place_order', cart)
+    } else {
+        Swal.fire('Please add product first!', '', 'error')
+    }
 }
 
 let todayDate = new Date().toLocaleDateString()
@@ -141,6 +165,10 @@ let todayDate = new Date().toLocaleDateString()
         </template>
         <div class="py-8">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div v-if="errors.length" class="text-red-600">
+                    <p class="text-xl" v-for="error in errors">{{ error }}</p>
+                    <p class="text-xl">Try again!</p>
+                </div>
                 <p class="text-xl px-4">Customer : {{ customer.name }}</p>
                 <ul class="max-w-md divide-y divide-gray-200 dark:divide-gray-700 px-4">
                     <li v-for="product in products" class="pt-3 pb-0 sm:pt-4">
@@ -148,12 +176,21 @@ let todayDate = new Date().toLocaleDateString()
                             <div class="flex flex-col flex-shrink-0">
                                 <p class="text-xl">{{ product.name }}</p>
                                 <div v-if="product.special_price.id !== undefined">
-                                    <p class="text-gray-700 text-sm">Your price : $
-                                        {{ parseFloat(product.special_price.price).toFixed(2) }}</p>
-                                    <p class="text-gray-700 text-sm"> Original Price :
-                                        ${{ parseFloat(product.price).toFixed(2) }}</p>
-                                    <p class="text-gray-700 text-sm">Remaining stocks:
-                                        {{ parseInt(product.special_price.max_stock) }}</p>
+                                    <div v-if="product.special_price.type === 'special price module'">
+                                        <p class="text-gray-700 text-sm">Your price : $
+                                            {{ parseFloat(product.special_price.price).toFixed(2) }}</p>
+                                        <p class="text-gray-700 text-sm"> Original Price :
+                                            ${{ parseFloat(product.price).toFixed(2) }}</p>
+                                        <p class="text-gray-700 text-sm">Remaining stocks:
+                                            {{ parseInt(product.special_price.max_stock) }}</p>
+                                    </div>
+                                    <div v-else>
+                                        <p class="text-gray-700 text-sm">Buy
+                                            {{ parseInt(product.special_price.foc_quantity) }} Free
+                                            {{ parseInt(product.special_price.foc_gift) }}</p>
+                                        <p class="text-gray-700 text-sm">Price :
+                                            ${{ parseFloat(product.price).toFixed(2) }}</p>
+                                    </div>
                                 </div>
                                 <p v-else>Price : ${{ parseFloat(product.price).toFixed(2) }}</p>
                             </div>
@@ -171,7 +208,7 @@ let todayDate = new Date().toLocaleDateString()
                         class="flex items-center bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white w-full mx-6 cursor-pointer"
                         @click="placeOrder">
                         <p>Basket : {{ cart.products.length }} Item</p>
-                        <p class="ml-auto">$ {{cartTotalPrice.toFixed(2)}}</p>
+                        <p class="ml-auto">$ {{ cartTotalPrice.toFixed(2) }}</p>
                     </div>
                 </div>
             </div>

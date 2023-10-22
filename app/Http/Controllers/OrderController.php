@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\DriverCustomer;
 use App\Models\Order;
 use App\Models\OrderDetails;
 use App\Models\Price;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
 class OrderController extends Controller
@@ -40,7 +44,7 @@ class OrderController extends Controller
     {
         $products = Product::all();
         foreach ($products as &$product) {
-            $price            = Price::where('customer_id', $customer->id)->where('product_id', $product->id)->first();
+            $price                    = Price::where('customer_id', $customer->id)->where('product_id', $product->id)->first();
             $product['special_price'] = $price ?? [];
         }
         return Inertia::render('Frontend/NewOrder', [
@@ -54,7 +58,86 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'customer_id' => 'required|numeric|min:1',
+            'driver_id'   => 'required|numeric|min:1',
+            'products'    => 'required|array',
+        ]);
+
+        if ($validator->fails()) {
+            return Inertia::render('Frontend/NewOrder', [
+                'errors' => $validator->errors()->all(),
+            ]);
+        }
+
+        $data = $validator->getData();
+
+        $customer_id = $data['customer_id'];
+        $driver_id   = $data['driver_id'];
+        $products    = $data['products'];
+
+        // Create order with cart status
+        $order = Order::create([
+            'customer_id' => $customer_id,
+            'driver_id'   => $driver_id,
+            'status'      => 'cart',
+        ]);
+        foreach ($products as $product) {
+            $total_quantity = $product['discount']['quantity'] + $product['original']['quantity'];
+            $price          = Price::where('customer_id', $customer_id)->where('product_id', $product['id'])->first();
+            if ($price) {
+                if ($price->type === 'foc module') { // foc module
+                    $quantity = $total_quantity + (intval($total_quantity / $price->foc_quantity) * $price->foc_gift);
+                    $price    = $total_quantity * $price->price;
+                    OrderDetails::create([
+                        'order_id'   => $order->id,
+                        'product_id' => $product['id'],
+                        'price'      => $price,
+                        'quantity'   => $quantity,
+                    ]);
+                } else { // special price module
+                    if ($total_quantity <= $price->max_stock) {
+                        $quantity = $total_quantity;
+                        $price    = $quantity * $price->price;
+                        OrderDetails::create([
+                            'order_id'   => $order->id,
+                            'product_id' => $product['id'],
+                            'price'      => $price,
+                            'quantity'   => $quantity,
+                        ]);
+                    } else {
+                        $special_price    = $price->price;
+                        $special_quantity = $price->max_stock;
+                        OrderDetails::create([
+                            'order_id'   => $order->id,
+                            'product_id' => $product['id'],
+                            'price'      => $special_price,
+                            'quantity'   => $special_quantity,
+                        ]);
+
+                        $CurrentProduct    = $price->product;
+                        $original_quantity = $total_quantity - $price->max_stock;
+                        $original_price    = $CurrentProduct->price;
+                        OrderDetails::create([
+                            'order_id'   => $order->id,
+                            'product_id' => $product['id'],
+                            'price'      => $original_price,
+                            'quantity'   => $original_quantity,
+                        ]);
+                    }
+                }
+            } else {
+                $CurrentProduct = $price->product;
+                OrderDetails::create([
+                    'order_id'   => $order->id,
+                    'product_id' => $product['id'],
+                    'price'      => $CurrentProduct->price,
+                    'quantity'   => $product['quantity'],
+                ]);
+            }
+        }
+
+        return Redirect::route('confirm_order', $order->id);
     }
 
     /**
@@ -92,12 +175,15 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Order $order)
+    public function destroy(string $id): \Illuminate\Http\RedirectResponse
     {
-        //
+        $order = Order::find($id);
+        $order->delete();
+
+        return Redirect::route('frontend_customers')->with('success', 'Order cancelled!');
     }
 
-    public function completeOrder(Order $order)
+    public function completeOrder(Order $order): \Illuminate\Http\JsonResponse
     {
         $data = [
             'status' => 'completed',
@@ -120,5 +206,32 @@ class OrderController extends Controller
                 'orders' => $orders,
             ],
         ]);
+    }
+
+    public function confirmOrder(string $id): \Inertia\Response
+    {
+        $order         = Order::find($id);
+        $order_details = OrderDetails::where('order_id', $order->id)->get();
+        $customer      = $order->customer;
+        $total_price   = 0;
+        foreach ($order_details as &$detail) {
+            $detail['product'] = $detail->product;
+            $total_price       += $detail->price;
+        }
+        return Inertia::render('Frontend/ConfirmOrder', [
+            'order'    => $order,
+            'details'  => $order_details,
+            'customer' => $customer,
+            'total'    => $total_price,
+        ]);
+    }
+
+    public function payOrder(string $id)
+    {
+        $order = Order::find($id);
+        $order->update([
+            'status' => 'pending'
+        ]);
+        return Redirect::route('frontend_orders')->with('success', 'Order confirmed!');
     }
 }
