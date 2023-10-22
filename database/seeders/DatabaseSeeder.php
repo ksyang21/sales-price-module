@@ -34,11 +34,16 @@ class DatabaseSeeder extends Seeder
         foreach ($customers as $customer) {
             foreach ($products as $product) {
                 $original_price = $product->price;
+                $types          = ['special price module', 'foc module'];
+                $type           = $types[array_rand($types)];
                 $price_data     = [
-                    'product_id'  => $product->id,
-                    'customer_id' => $customer->id,
-                    'price'       => mt_rand(0, $original_price * 100) / 100.0,
-                    'max_stock'   => rand(1, 10),
+                    'product_id'   => $product->id,
+                    'customer_id'  => $customer->id,
+                    'type'         => $type,
+                    'price'        => $type === 'special price module' ? mt_rand(0, $original_price * 100) / 100.0 : $original_price,
+                    'max_stock'    => $type === 'special price module' ? rand(1, 10) : 0,
+                    'foc_quantity' => $type === 'foc_module' ? 10 : 0,
+                    'foc_gift'     => $type === 'foc_module' ? 1 : 0,
                 ];
                 Price::create($price_data);
             }
