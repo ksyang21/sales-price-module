@@ -42,8 +42,8 @@ class DatabaseSeeder extends Seeder
                     'type'         => $type,
                     'price'        => $type === 'special price module' ? mt_rand(0, $original_price * 100) / 100.0 : $original_price,
                     'max_stock'    => $type === 'special price module' ? rand(1, 10) : 0,
-                    'foc_quantity' => $type === 'foc_module' ? 10 : 0,
-                    'foc_gift'     => $type === 'foc_module' ? 1 : 0,
+                    'foc_quantity' => $type === 'foc module' ? 10 : 0,
+                    'foc_gift'     => $type === 'foc module' ? 1 : 0,
                 ];
                 Price::create($price_data);
             }
