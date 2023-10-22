@@ -1,6 +1,7 @@
 <script setup>
-import {Head, Link} from "@inertiajs/vue3";
+import {Head, Link, router} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import {inject} from "vue";
 
 const props = defineProps({
     product: {
@@ -10,6 +11,20 @@ const props = defineProps({
         type: Object
     }
 })
+
+const Swal = inject('$swal')
+
+function removePrice(price) {
+    Swal.fire({
+        title: `Remove ${props.product.name} for ${price.customer.name}?`,
+        icon: 'info',
+        showCancelButton: true
+    }).then((result) => {
+        if(result.isConfirmed) {
+            router.delete(`/price/${price.id}`)
+        }
+    })
+}
 </script>
 
 <template>
@@ -68,14 +83,7 @@ const props = defineProps({
                                         <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500">
                                             Edit
                                         </button>
-                                        <Link
-                                            as="button"
-                                            method="delete"
-                                            :href="route('price.destroy', price.id)"
-                                            class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3"
-                                        >
-                                            Remove
-                                        </Link>
+                                        <button class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3" @click="removePrice(price)">Remove</button>
                                     </td>
                                 </tr>
                                 </tbody>
