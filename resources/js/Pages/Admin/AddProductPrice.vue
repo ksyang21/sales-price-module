@@ -31,6 +31,7 @@ function resetPrice() {
     form.price = props.product.price
     form.foc = foc.value
     if (foc.value) {
+        form.price = 0
         form.max_stock = 0
     }
 }
