@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             $product      = sprintf('Item %d', $i);
             $product_data = [
                 'name'  => $product,
-                'price' => fake()->randomFloat(2, 0, 3000),
+                'price' => intval(fake()->randomFloat(2, 0, 3000)),
             ];
             Product::create($product_data);
         }
@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
                     'product_id'   => $product->id,
                     'customer_id'  => $customer->id,
                     'type'         => $type,
-                    'price'        => $type === 'special price module' ? mt_rand(0, $original_price * 100) / 100.0 : $original_price,
+                    'price'        => $type === 'special price module' ? intval(mt_rand(0, $original_price * 100) / 100.0) : $original_price,
                     'max_stock'    => $type === 'special price module' ? rand(1, 10) : 0,
                     'foc_quantity' => $type === 'foc module' ? 10 : 0,
                     'foc_gift'     => $type === 'foc module' ? 1 : 0,
@@ -77,30 +77,41 @@ class DatabaseSeeder extends Seeder
 
                     $price             = Price::where('product_id', $product->id)->where('customer_id', $customer->id)->first();
                     $purchase_quantity = rand(1, 15);
-                    if ($purchase_quantity < $price->max_stock) {
-                        $order_details = [
-                            'order_id'   => $order->id,
-                            'product_id' => $product->id,
-                            'price'      => $price->price,
-                            'quantity'   => $purchase_quantity,
-                        ];
+                    if($price->type === 'special price module') {
+                        if ($purchase_quantity < $price->max_stock) {
+                            $order_details = [
+                                'order_id'   => $order->id,
+                                'product_id' => $product->id,
+                                'price'      => $price->price,
+                                'quantity'   => $purchase_quantity,
+                            ];
+                        } else {
+                            $order_details = [
+                                'order_id'   => $order->id,
+                                'product_id' => $product->id,
+                                'price'      => $price->price,
+                                'quantity'   => $price->max_stock,
+                            ];
+                            OrderDetails::create($order_details);
+
+                            $order_details = [
+                                'order_id'   => $order->id,
+                                'product_id' => $product->id,
+                                'price'      => $product->price,
+                                'quantity'   => ($purchase_quantity - $price->max_stock),
+                            ];
+                        }
+                        OrderDetails::create($order_details);
                     } else {
+                        $quantity = $purchase_quantity + (intval($purchase_quantity / $price->foc_quantity) * $price->foc_gift);
                         $order_details = [
                             'order_id'   => $order->id,
                             'product_id' => $product->id,
                             'price'      => $price->price,
-                            'quantity'   => $price->max_stock,
+                            'quantity'   => $quantity,
                         ];
                         OrderDetails::create($order_details);
-
-                        $order_details = [
-                            'order_id'   => $order->id,
-                            'product_id' => $product->id,
-                            'price'      => $product->price,
-                            'quantity'   => ($purchase_quantity - $price->max_stock),
-                        ];
                     }
-                    OrderDetails::create($order_details);
                 }
             }
         }
