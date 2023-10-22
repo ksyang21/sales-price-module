@@ -97,9 +97,12 @@ class CustomerController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Customer $customer)
+    public function edit(string $id)
     {
-        //
+        $customer = Customer::find($id);
+        return Inertia::render('Admin/EditCustomer', [
+            'customer' => $customer
+        ]);
     }
 
     /**
@@ -107,7 +110,26 @@ class CustomerController extends Controller
      */
     public function update(Request $request, Customer $customer)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|numeric|min:0',
+            'name' => 'required|string|max:255',
+            'address' => 'required|string'
+        ]);
+
+        if($validator->fails()) {
+            return Inertia::render('Admin/EditCustomer', [
+                'errors' => $validator->errors()->all()
+            ]);
+        }
+
+        $data = $validator->getData();
+        $customer = Customer::find($data['id']);
+        $customer->update([
+            'name' => $data['name'],
+            'address' => $data['address']
+        ]);
+
+        return Redirect::route('customer_management')->with('success', 'Customer details updated!');
     }
 
     /**

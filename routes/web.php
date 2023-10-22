@@ -52,7 +52,9 @@ Route::middleware(['role:admin'])->group(function () {
     Route::get('/customer_management', [CustomerController::class, 'index'])->name('customer_management');
     Route::get('/create-customer', [CustomerController::class, 'create'])->name('customer.create');
     Route::get('/customer/{id}', [CustomerController::class, 'show'])->name('customer.show');
+    Route::get('/edit_customer/{id}', [CustomerController::class, 'edit'])->name('customer.edit');
     Route::post('/customer', [CustomerController::class, 'store'])->name('customer.store');
+    Route::put('/customer/{id}', [CustomerController::class, 'update'])->name('customer.update');
     Route::delete('/customer/{id}', [CustomerController::class, 'destroy'])->name('customer.destroy');
     Route::get('/products', [ProductController::class, 'index'])->name('products');
     Route::get('/create-product', [ProductController::class, 'create'])->name('product.create');

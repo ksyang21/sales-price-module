@@ -22,6 +22,10 @@ function removeCustomer(customer) {
         }
     })
 }
+
+function editCustomer(customer) {
+    router.get(`/edit_customer/${customer.id}`)
+}
 </script>
 
 <template>
@@ -78,8 +82,7 @@ function removeCustomer(customer) {
                                 >
                                     View
                                 </Link>
-                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ml-3">Edit
-                                </button>
+                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ml-3" @click="editCustomer(customer)">Edit</button>
                                 <button class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3" @click="removeCustomer(customer)">Remove</button>
                             </td>
                         </tr>
