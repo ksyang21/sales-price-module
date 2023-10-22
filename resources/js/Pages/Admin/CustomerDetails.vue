@@ -45,7 +45,7 @@ function removePrice(price) {
         showCancelButton: true
     }).then((result) => {
         if(result.isConfirmed) {
-            router.delete(`/price/${customer.id}`)
+            router.delete(`/price/${price.id}`)
         }
     })
 }
