@@ -26,14 +26,14 @@ class PriceController extends Controller
     public function create(string $id)
     {
         $current_route = Route::current()->getName();
-        if($current_route === 'price.product.create') {
-            $product = Product::find($id);
+        if ($current_route === 'price.product.create') {
+            $product                  = Product::find($id);
             $customers_without_prices = Customer::whereDoesntHave('prices', function ($query) use ($product) {
                 $query->where('product_id', $product->id);
             })->get();
 
             return Inertia::render('Admin/AddProductPrice', [
-                'product' => $product,
+                'product'   => $product,
                 'customers' => $customers_without_prices,
             ]);
         } else {
@@ -51,7 +51,7 @@ class PriceController extends Controller
 
             return Inertia::render('Admin/AddCustomerPrice', [
                 'customer' => $customer,
-                'products' => $products_without_prices
+                'products' => $products_without_prices,
             ]);
         }
     }
@@ -62,20 +62,25 @@ class PriceController extends Controller
     public function store(Request $request)
     {
         $validated_data = $request->validate([
-            'product' => 'required|numeric|min:0|not_in:0',
-            'customer' => 'required|numeric|min:0|not_in:0',
-            'price' => 'required|numeric|min:0',
+            'product'   => 'required|numeric|min:0|not_in:0',
+            'customer'  => 'required|numeric|min:0|not_in:0',
+            'price'     => 'required|numeric|min:0',
             'max_stock' => 'required|numeric|min:0|max:100',
+            'foc'       => 'required|boolean',
         ]);
 
-        $price = Price::create([
-            'product_id' => $validated_data['product'],
-            'customer_id' => $validated_data['customer'],
-            'price' => $validated_data['price'],
-            'max_stock' => $validated_data['max_stock']
+        $is_foc_module = $validated_data['foc'];
+        $price         = Price::create([
+            'product_id'   => $validated_data['product'],
+            'customer_id'  => $validated_data['customer'],
+            'price'        => $validated_data['price'],
+            'max_stock'    => $validated_data['max_stock'],
+            'type'         => $is_foc_module ? 'foc module' : 'special price module',
+            'foc_quantity' => $is_foc_module ? 10 : 0,
+            'foc_gift'     => $is_foc_module ? 1 : 0,
         ]);
 
-        if($request->input('source') === 'product') {
+        if ($request->input('source') === 'product') {
             return Redirect::route('product.show', $validated_data['product'])->with('success', 'Price added!');
         } else {
             return Redirect::route('customer.show', $validated_data['customer'])->with('success', 'Price added!');
@@ -112,7 +117,7 @@ class PriceController extends Controller
     public function destroy(string $id)
     {
         $price = Price::find($id);
-        if($price) {
+        if ($price) {
             $price->delete();
             return Redirect::route('product.show', $id)->with('success', 'Price removed!');
         } else {

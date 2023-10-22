@@ -102,7 +102,9 @@ function updateDriver() {
                                         $ {{ parseFloat(price.price).toFixed(2) }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        {{ price.max_stock }}
+                                        {{
+                                            price.type === 'special price module' ? price.max_stock : `Buy ${price.foc_quantity} Free ${price.foc_gift}`
+                                        }}
                                     </td>
                                     <td class="px-6 py-4">
                                         <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500">
