@@ -87,7 +87,7 @@ function deleteOrder() {
                         <p class="text-xl">Order Summary</p>
                         <p class="text-sm text-gray-700">Customer: {{ customer.name }}</p>
                     </div>
-                    <span class="bg-red-300 text-red-800 text-xl font-medium mr-2 px-2.5 py-0.5 rounded ml-auto">Order ID : #{{
+                    <span class="bg-red-300 text-red-800 text-xl font-medium mr-2 px-2.5 py-0.5 rounded ml-auto">Order #{{
                             order.id
                         }}</span>
                 </div>
@@ -101,18 +101,20 @@ function deleteOrder() {
                                     }}X</span>
                                 <div class="flex flex-col ml-4">
                                     <p class="text-xl">{{ detail.product.name }}</p>
-                                    <p class="text-blue-700" @click="editItem(detail)">Edit</p>
+                                    <p class="text-sm" v-if="parseInt(detail.is_foc) === 0">Unit price : ${{ parseFloat(detail.price).toFixed(2) }}</p>
+                                    <p v-if="parseInt(detail.is_foc) === 0" class="text-blue-700" @click="editItem(detail)">Edit</p>
+                                    <p v-else class="text-red-600 text-sm">FOC</p>
                                 </div>
                                 <div class="flex items-center ml-auto">
-                                    <p class="text-xl">$ {{ detail.price }}</p>
-                                    <p class="text-red-700 ml-3" @click="deleteItem(detail)">Delete</p>
+                                    <p class="text-xl">$ {{ parseFloat(detail.price * detail.quantity).toFixed(2) }}</p>
+                                    <p v-if="parseInt(detail.is_foc) === 0" class="text-red-700 ml-3" @click="deleteItem(detail)">Delete</p>
                                 </div>
                             </div>
                         </li>
                     </ul>
                 </div>
                 <div class="mt-6">
-                    <p class="text-2xl mx-6">Total : $ {{ total }}</p>
+                    <p class="text-2xl mx-6">Total : $ {{ parseFloat(total).toFixed(2) }}</p>
                 </div>
                 <div class="flex flex-col items-center justify-center mt-6 mb-12 mx-6">
                     <button class="bg-blue-700 text-white py-2 hover:bg-blue-800 rounded w-full" @click="confirmOrder">

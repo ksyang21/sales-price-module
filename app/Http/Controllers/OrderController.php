@@ -96,13 +96,15 @@ class OrderController extends Controller
                         'is_foc'     => 0,
                     ]);
                     $foc_gift = intval($total_quantity / $price->foc_quantity) * $price->foc_gift;
-                    OrderDetails::create([
-                        'order_id'   => $order->id,
-                        'product_id' => $product['id'],
-                        'price'      => 0,
-                        'quantity'   => $foc_gift,
-                        'is_foc'     => 1,
-                    ]);
+                    if ($foc_gift > 0) {
+                        OrderDetails::create([
+                            'order_id'   => $order->id,
+                            'product_id' => $product['id'],
+                            'price'      => 0,
+                            'quantity'   => $foc_gift,
+                            'is_foc'     => 1,
+                        ]);
+                    }
                 } else { // special price module
                     if ($total_quantity <= $price->max_stock) {
                         $quantity = $total_quantity;
@@ -228,6 +230,7 @@ class OrderController extends Controller
         $total_price   = 0;
         foreach ($order_details as &$detail) {
             $detail['product'] = $detail->product;
+            $detail['special_price'] = Price::where('product_id', $detail['product']->id)->where('customer_id', $customer->id)->first();
             $total_price       += $detail->price * $detail->quantity;
         }
         return Inertia::render('Frontend/ConfirmOrder', [

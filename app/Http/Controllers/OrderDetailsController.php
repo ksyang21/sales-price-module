@@ -79,24 +79,26 @@ class OrderDetailsController extends Controller
 
         // Delete all order details with this product
         if ($price) {
-            OrderDetails::where('product_id', $product->id)->delete();
+            OrderDetails::where('product_id', $product->id)->where('order_id', $order->id)->delete();
             if ($price->type === 'foc module') { // foc module
 //                $price    = $quantity * $price->price;
                 OrderDetails::create([
                     'order_id'   => $order->id,
                     'product_id' => $product['id'],
-                    'price'      => $price,
+                    'price'      => $price->price,
                     'quantity'   => $quantity,
                     'is_foc'     => 0,
                 ]);
                 $foc_gift = intval($quantity / $price->foc_quantity) * $price->foc_gift;
-                OrderDetails::create([
-                    'order_id'   => $order->id,
-                    'product_id' => $product['id'],
-                    'price'      => 0,
-                    'quantity'   => $foc_gift,
-                    'is_foc'     => 1,
-                ]);
+                if ($foc_gift > 0) {
+                    OrderDetails::create([
+                        'order_id'   => $order->id,
+                        'product_id' => $product['id'],
+                        'price'      => 0,
+                        'quantity'   => $foc_gift,
+                        'is_foc'     => 1,
+                    ]);
+                }
             } else { // special price module
                 if ($quantity <= $price->max_stock) {
                     $price = $quantity * $price->price;
@@ -105,7 +107,7 @@ class OrderDetailsController extends Controller
                         'product_id' => $product['id'],
                         'price'      => $price,
                         'quantity'   => $quantity,
-                    'is_foc'     => 0,
+                        'is_foc'     => 0,
                     ]);
                 } else {
                     $special_price    = $price->price;
@@ -115,7 +117,7 @@ class OrderDetailsController extends Controller
                         'product_id' => $product['id'],
                         'price'      => $special_price,
                         'quantity'   => $special_quantity,
-                    'is_foc'     => 0,
+                        'is_foc'     => 0,
                     ]);
 
                     $original_quantity = $quantity - $price->max_stock;
@@ -125,7 +127,7 @@ class OrderDetailsController extends Controller
                         'product_id' => $product['id'],
                         'price'      => $original_price,
                         'quantity'   => $original_quantity,
-                    'is_foc'     => 0,
+                        'is_foc'     => 0,
                     ]);
                 }
             }
@@ -141,9 +143,93 @@ class OrderDetailsController extends Controller
      */
     public function destroy(string $id)
     {
-        $order_detail = OrderDetails::find($id);
-        $order_id     = $order_detail->order_id;
-        $order_detail->delete();
+        $order_detail          = OrderDetails::find($id);
+        $order_id              = $order_detail->order_id;
+        $product_id            = $order_detail->product_id;
+        $order_detail_quantity = $order_detail->quantity;
+
+        $order       = $order_detail->order;
+        $customer_id = $order->customer_id;
+
+        $all_order_details_of_product = OrderDetails::where('product_id', $product_id)->where('order_id', $order_id)->get();
+        if (count($all_order_details_of_product) < 2) {
+            $order_detail->delete();
+        } else {
+            $total_quantity = 0;
+            foreach ($all_order_details_of_product as $item) {
+                if (intval($item->is_foc) === 0) {
+                    $total_quantity += $item->quantity;
+                }
+            }
+            $price   = Price::where('product_id', $product_id)->where('customer_id', $customer_id)->first();
+            $product = $price->product;
+
+            OrderDetails::where('product_id', $product_id)->where('order_id', $order_id)->delete();
+            $balance = $total_quantity - $order_detail_quantity;
+            if ($balance > 0) {
+                if ($price) {
+                    if ($price->type === 'foc module') { // foc module
+                        OrderDetails::create([
+                            'order_id'   => $order_id,
+                            'product_id' => $product_id,
+                            'price'      => $product->price,
+                            'quantity'   => $balance,
+                            'is_foc'     => 0,
+                        ]);
+                        $foc_gift = intval($balance / $price->foc_quantity) * $price->foc_gift;
+                        if ($foc_gift > 0) {
+                            OrderDetails::create([
+                                'order_id'   => $order_id,
+                                'product_id' => $product_id,
+                                'price'      => 0,
+                                'quantity'   => $foc_gift,
+                                'is_foc'     => 1,
+                            ]);
+                        }
+                    } else { // special price module
+                        if ($balance <= $price->max_stock) {
+                            $price = $balance * $price->price;
+                            OrderDetails::create([
+                                'order_id'   => $order_id,
+                                'product_id' => $product_id,
+                                'price'      => $price,
+                                'quantity'   => $balance,
+                                'is_foc'     => 0,
+                            ]);
+                        } else {
+                            $special_price    = $price->price;
+                            $special_quantity = $price->max_stock;
+                            OrderDetails::create([
+                                'order_id'   => $order_id,
+                                'product_id' => $product_id,
+                                'price'      => $special_price,
+                                'quantity'   => $special_quantity,
+                                'is_foc'     => 0,
+                            ]);
+
+                            $original_quantity = $balance - $price->max_stock;
+                            $original_price    = $product->price;
+                            OrderDetails::create([
+                                'order_id'   => $order_id,
+                                'product_id' => $product_id,
+                                'price'      => $original_price,
+                                'quantity'   => $original_quantity,
+                                'is_foc'     => 0,
+                            ]);
+                        }
+                    }
+                } else {
+                    OrderDetails::create([
+                        'order_id'   => $order_id,
+                        'product_id' => $product_id,
+                        'price'      => $product->price,
+                        'quantity'   => $balance,
+                        'is_foc'     => 0,
+                    ]);
+                }
+            }
+        }
+
 
         return Redirect::route('confirm_order', $order_id);
 
