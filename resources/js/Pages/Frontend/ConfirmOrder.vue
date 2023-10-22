@@ -5,14 +5,14 @@ import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 import {inject} from "vue";
 
 const props = defineProps({
-    order: Object,
-    details: Object,
-    customer: Object,
-    total: Number
+  order: Object,
+  details: Object,
+  customer: Object,
+  total: Number
 })
 
 const form = {
-    id: props.order.id,
+  id: props.order.id,
 }
 
 const Swal = inject('$swal')
@@ -20,113 +20,126 @@ const Swal = inject('$swal')
 let todayDate = new Date().toLocaleDateString()
 
 function confirmOrder() {
-    router.put(`/pay_order/${props.order.id}`)
+  router.put(`/pay_order/${props.order.id}`)
 }
 
 function deleteItem(detail) {
-    Swal.fire({
-        title: 'Delete item?',
-        html: `Product : ${detail.product.name}<br>Quantity : ${detail.quantity}`,
-        icon: 'warning',
-        showCancelButton: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            router.delete(`/order_detail/${detail.id}`)
-        }
-    })
+  Swal.fire({
+    title: 'Delete item?',
+    html: `Product : ${detail.product.name}<br>Quantity : ${detail.quantity}`,
+    icon: 'warning',
+    showCancelButton: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      router.delete(`/order_detail/${detail.id}`)
+    }
+  })
 }
 
 async function editItem(detail) {
-    let totalQuantity = 0
-    let items = props.details.filter((item) => {
-        return item.product_id === parseInt(detail.product_id)
-    })
-    for(let item of items) {
-        totalQuantity += parseInt(item.quantity)
+  let totalQuantity = 0
+  let items = props.details.filter((item) => {
+    return item.product_id === parseInt(detail.product_id)
+  })
+  for (let item of items) {
+    totalQuantity += parseInt(item.quantity)
+  }
+  let {value: quantity} = await Swal.fire({
+    title: `How many pieces of ${detail.product.name}?`,
+    text: `Current quantity : ${totalQuantity}`,
+    input: 'number',
+    inputPlaceholder: `Enter quantity of ${detail.product.name}`
+  })
+  if (quantity) {
+    quantity = parseInt(quantity)
+    let form = {
+      id: detail.id,
+      quantity: quantity
     }
-    let {value: quantity} = await Swal.fire({
-        title: `How many pieces of ${detail.product.name}?`,
-        text: `Current quantity : ${totalQuantity}`,
-        input: 'number',
-        inputPlaceholder: `Enter quantity of ${detail.product.name}`
-    })
-    if(quantity) {
-        quantity = parseInt(quantity)
-        let form = {
-            id: detail.id,
-            quantity: quantity
-        }
-        router.put('/order_detail', form)
-    }
+    router.put('/order_detail', form)
+  }
 }
 
 function deleteOrder() {
-    Swal.fire({
-        title: 'Cancel order?',
-        icon: 'info',
-        showCancelButton: true
-    }).then((result)=> {
-        if(result.isConfirmed) {
-            router.delete(`/order/${props.order.id}`)
-        }
-    })
+  Swal.fire({
+    title: 'Cancel order?',
+    icon: 'info',
+    showCancelButton: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      router.delete(`/order/${props.order.id}`)
+    }
+  })
 }
 
 </script>
 
 <template>
-    <Head title="New Order"/>
-    <FrontendLayout>
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight text-center">{{ todayDate }}</h2>
-        </template>
-        <div class="py-8">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="flex items-center px-2">
-                    <div class="flex flex-col">
-                        <p class="text-xl">Order Summary</p>
-                        <p class="text-sm text-gray-700">Customer: {{ customer.name }}</p>
-                    </div>
-                    <span class="bg-red-300 text-red-800 text-xl font-medium mr-2 px-2.5 py-0.5 rounded ml-auto">Order #{{
-                            order.id
-                        }}</span>
-                </div>
-                <div class="border-t-2 border-b-2 mt-3">
-                    <ul class="max-w-md divide-y divide-gray-200 dark:divide-gray-700 px-4">
-                        <li v-for="detail in details" class="pt-3 pb-3 sm:pt-4">
-                            <div class="flex items-center">
+  <Head title="New Order"/>
+  <FrontendLayout>
+    <template #header>
+      <h2 class="font-semibold text-xl text-gray-800 leading-tight text-center">{{ todayDate }}</h2>
+    </template>
+    <div class="py-8">
+      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="flex items-center px-2">
+          <div class="flex flex-col">
+            <p class="text-xl">Order Summary</p>
+            <p class="text-sm text-gray-700">Customer: {{ customer.name }}</p>
+          </div>
+          <span class="bg-red-300 text-red-800 text-xl font-medium mr-2 px-2.5 py-0.5 rounded ml-auto">Order #{{
+              order.id
+            }}</span>
+        </div>
+        <div class="border-t-2 border-b-2 mt-3">
+          <ul class="max-w-md divide-y divide-gray-200 dark:divide-gray-700 px-4">
+            <li v-for="detail in details" class="pt-3 pb-3 sm:pt-4">
+              <div class="flex items-center">
                                 <span
                                     class="bg-gray-300 text-gray-800 text-xl font-medium px-2.5 py-0.5 rounded ">{{
-                                        detail.quantity
-                                    }}X</span>
-                                <div class="flex flex-col ml-4">
-                                    <p class="text-xl">{{ detail.product.name }}</p>
-                                    <p class="text-sm" v-if="parseInt(detail.is_foc) === 0">Unit price : ${{ parseFloat(detail.price).toFixed(2) }}</p>
-                                    <p v-if="parseInt(detail.is_foc) === 0" class="text-blue-700" @click="editItem(detail)">Edit</p>
-                                    <p v-else class="text-red-600 text-sm">FOC</p>
-                                </div>
-                                <div class="flex items-center ml-auto">
-                                    <p class="text-xl">$ {{ parseFloat(detail.price * detail.quantity).toFixed(2) }}</p>
-                                    <p v-if="parseInt(detail.is_foc) === 0" class="text-red-700 ml-3" @click="deleteItem(detail)">Delete</p>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
+                                    detail.quantity
+                                  }}X</span>
+                <div class="flex flex-col ml-4">
+                  <p class="text-xl">{{ detail.product.name }}</p>
+                  <p class="text-sm" v-if="parseInt(detail.is_foc) === 0">Unit price :
+                    ${{ parseFloat(detail.price).toFixed(2) }}</p>
+                  <p v-if="parseInt(detail.is_foc) === 0" class="text-blue-700" @click="editItem(detail)">Edit</p>
+                  <p v-else class="text-red-600 text-sm">FOC</p>
                 </div>
-                <div class="mt-6">
-                    <p class="text-2xl mx-6">Total : $ {{ parseFloat(total).toFixed(2) }}</p>
+                <div class="flex items-center ml-auto">
+                  <p class="text-xl">$ {{ parseFloat(detail.price * detail.quantity).toFixed(2) }}</p>
+                  <p v-if="parseInt(detail.is_foc) === 0" class="text-red-700 ml-3" @click="deleteItem(detail)">
+                    Delete</p>
                 </div>
-                <div class="flex flex-col items-center justify-center mt-6 mb-12 mx-6">
-                    <button class="bg-blue-700 text-white py-2 hover:bg-blue-800 rounded w-full" @click="confirmOrder">
-                        Confirm
-                    </button>
-                    <button class="bg-red-700 text-white py-2 hover:bg-red-800 rounded w-full mt-2"
-                            @click="deleteOrder">Cancel
-                    </button>
-                </div>
-            </div>
+              </div>
+            </li>
+          </ul>
         </div>
-    </FrontendLayout>
+        <div class="mt-3 mx-6">
+          <p class="text-2xl pt-3 pb-3 border-b-2">Total : $ {{ parseFloat(total).toFixed(2) }}</p>
+          <div class="py-3">
+            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                   for="payment-methods">Payment Methods</label>
+            <select
+                class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                id="payment-methods"
+            >
+              <option selected>Card</option>
+              <option>Cash on Delivery</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex flex-col items-center justify-center mt-6 mb-12 mx-6">
+          <button class="bg-blue-700 text-white py-2 hover:bg-blue-800 rounded w-full" @click="confirmOrder">
+            Confirm
+          </button>
+          <button class="bg-red-700 text-white py-2 hover:bg-red-800 rounded w-full mt-2"
+                  @click="deleteOrder">Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </FrontendLayout>
 </template>
 
 <style scoped>
