@@ -22,6 +22,10 @@ function removeDriver(driver) {
         }
     })
 }
+
+function editDriver(driver) {
+    router.get(`/edit_driver/${driver.id}`)
+}
 </script>
 
 <template>
@@ -75,8 +79,7 @@ function removeDriver(driver) {
                                 >
                                     View
                                 </Link>
-                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ml-3">Edit
-                                </button>
+                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ml-3" @click="editDriver(driver)">Edit</button>
                                 <button class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3" @click="removeDriver(driver)">Remove</button>
                             </td>
                         </tr>

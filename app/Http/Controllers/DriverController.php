@@ -106,7 +106,10 @@ class DriverController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $driver = User::find($id);
+        return Inertia::render('Admin/EditDriver', [
+            'driver' => $driver
+        ]);
     }
 
     /**
@@ -114,7 +117,24 @@ class DriverController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|numeric|min:0',
+            'name' => 'required|string|max:255',
+        ]);
+
+        if($validator->fails()) {
+            return Inertia::render('Admin/EditDriver', [
+                'errors' => $validator->errors()->all()
+            ]);
+        }
+
+        $data = $validator->getData();
+        $user = User::find($data['id']);
+        $user->update([
+            'name' => $data['name'],
+        ]);
+
+        return Redirect::route('driver_management')->with('success', 'Driver name updated!');
     }
 
     /**

@@ -45,7 +45,9 @@ Route::middleware(['role:admin'])->group(function () {
     Route::get('/driver_management', [DriverController::class, 'index'])->name('driver_management');
     Route::get('/create-driver', [DriverController::class, 'create'])->name('driver.create');
     Route::get('/driver/{id}', [DriverController::class, 'show'])->name('driver.show');
+    Route::get('/edit_driver/{id}', [DriverController::class, 'edit'])->name('driver.edit');
     Route::post('/driver', [DriverController::class, 'store'])->name('driver.store');
+    Route::put('/driver/{id}', [DriverController::class, 'update'])->name('driver.update');
     Route::delete('/driver/{id}', [DriverController::class, 'destroy'])->name('driver.destroy');
     Route::get('/customer_management', [CustomerController::class, 'index'])->name('customer_management');
     Route::get('/create-customer', [CustomerController::class, 'create'])->name('customer.create');
