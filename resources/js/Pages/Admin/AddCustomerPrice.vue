@@ -18,7 +18,8 @@ const form = reactive({
     customer: props.customer.id,
     product: 0,
     price: 0.00,
-    max_stock: 0
+    max_stock: 0,
+    foc: false
 })
 
 let foc = ref(false)
@@ -32,21 +33,22 @@ function getProduct() {
     currentProduct = props.products.find((product) => {
         return product.id === productID
     })
-    form.price = currentProduct.price
-}
-
-function resetPrice() {
-    if(foc.value) {
-        form.price = 0.00
-    } else {
-        if(currentProduct) {
-            form.price = currentProduct.price
-        } else {
-            form.price = 0.00
-        }
+    if(!foc.value) {
+        form.price = currentProduct.price
     }
 }
 
+function resetPrice() {
+    form.price = 0
+    form.foc = foc.value
+    if (foc.value) {
+        form.max_stock = 0
+    } else {
+        if(currentProduct.id !== undefined) {
+            form.price = currentProduct.price
+        }
+    }
+}
 
 function validateForm() {
     canSubmit.value = (form.customer > 0 && form.product > 0)
@@ -94,7 +96,7 @@ function handleSubmit() {
                                 <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold"
                                        for="price">Price</label>
                                 <input type="checkbox" id="foc" class="ml-auto" v-model="foc" @change="resetPrice">
-                                <label for="foc" class="ml-2">FOC</label>
+                                <label for="foc" class="ml-2">FOC (Buy 10 Free 1)</label>
                             </div>
                             <input
                                 class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 disabled:bg-gray-300"
@@ -103,7 +105,7 @@ function handleSubmit() {
                                 :disabled="foc"
                             >
                         </div>
-                        <div class="w-full px-3 mb-3" v-if="form.price === 0.00">
+                        <div class="w-full px-3 mb-3" v-if="!foc">
                             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold"
                                    for="stock">Max Stock</label>
                             <p class="text-gray-300 text-sm mb-2">Original price will be used after this customer
