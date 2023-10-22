@@ -1,7 +1,7 @@
 <script setup>
 import {Head, Link, router} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {reactive} from "vue";
+import {inject, reactive} from "vue";
 
 const props = defineProps({
     customer: {
@@ -34,6 +34,20 @@ function updateDriver() {
             router.post('/driver_customer', form)
         }
     }
+}
+
+const Swal = inject('$swal')
+
+function removePrice(price) {
+    Swal.fire({
+        title: `Remove ${price.product.name} for ${props.customer.name}?`,
+        icon: 'info',
+        showCancelButton: true
+    }).then((result) => {
+        if(result.isConfirmed) {
+            router.delete(`/price/${customer.id}`)
+        }
+    })
 }
 
 </script>
@@ -110,14 +124,7 @@ function updateDriver() {
                                         <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500">
                                             Edit
                                         </button>
-                                        <Link
-                                            as="button"
-                                            method="delete"
-                                            :href="route('price.destroy', price.id)"
-                                            class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3"
-                                        >
-                                            Remove
-                                        </Link>
+                                        <button class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500 ml-3" @click="removePrice(price)">Remove</button>
                                     </td>
                                 </tr>
                                 </tbody>
