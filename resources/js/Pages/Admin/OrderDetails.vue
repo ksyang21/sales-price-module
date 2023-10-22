@@ -61,7 +61,8 @@ for(let detail of props.details) {
                                 {{ detail.product.name }}
                             </th>
                             <td class="px-6 py-4">
-                                $ {{ detail.price.toFixed(2) }}
+                              <p v-if="detail.price > 0">$ {{ detail.price.toFixed(2) }}</p>
+                              <p v-else>FOC Gift</p>
                             </td>
                             <td class="px-6 py-4 ">
                                 {{ detail.quantity }}

@@ -63,6 +63,7 @@ Route::middleware(['role:admin'])->group(function () {
     Route::delete('/price/{id}', [PriceController::class, 'destroy'])->name('price.destroy');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
+    Route::delete('/order/{id}', [OrderController::class, 'destroy'])->name('order.destroy');
     Route::post('/driver_customer', [\App\Http\Controllers\DriverCustomerController::class, 'store'])->name('driver_customer.create');
     Route::put('/driver_customer/{driverCustomer}', [\App\Http\Controllers\DriverCustomerController::class, 'update'])->name('driver_customer.update');
 });
@@ -74,7 +75,7 @@ Route::middleware(['role:driver'])->group(function () {
     Route::post('/place_order', [OrderController::class, 'store'])->name('order.store');
     Route::get('/confirm_order/{id}', [OrderController::class, 'confirmOrder'])->name('confirm_order');
     Route::put('/pay_order/{id}', [OrderController::class, 'payOrder'])->name('pay_order');
-    Route::delete('/order/{id}', [OrderController::class, 'destroy'])->name('cancel_order');
+    Route::delete('/cancel_order/{id}', [OrderController::class, 'cancelOrder'])->name('cancel_order');
     Route::delete('/order_detail/{id}', [OrderDetailsController::class, 'destroy'])->name('remove_detail');
     Route::put('/order_detail', [OrderDetailsController::class, 'update'])->name('update_detail');
 });

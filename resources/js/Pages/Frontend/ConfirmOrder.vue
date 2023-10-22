@@ -67,7 +67,7 @@ function deleteOrder() {
     showCancelButton: true
   }).then((result) => {
     if (result.isConfirmed) {
-      router.delete(`/order/${props.order.id}`)
+      router.delete(`/cancel_order/${props.order.id}`)
     }
   })
 }
