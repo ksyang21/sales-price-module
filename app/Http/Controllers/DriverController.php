@@ -153,7 +153,7 @@ class DriverController extends Controller
             $order['details'] = $order->details;
             $order['customer'] = $order->customer;
             foreach($order['details'] as $detail) {
-                $order['total_price'] += $detail['price'];
+                $order['total_price'] += $detail['price'] * $detail['quantity'];
             }
         }
         return Inertia::render('Frontend/Orders', [
