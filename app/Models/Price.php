@@ -13,8 +13,11 @@ class Price extends Model
     protected $fillable = [
         'product_id',
         'customer_id',
+        'type',
         'price',
         'max_stock',
+        'foc_quantity',
+        'foc_gift'
     ];
 
     public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo
